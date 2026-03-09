@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protean Asset Management</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap');
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy-deep: #080e27;
+            --navy-primary: #0a1744;
+            --navy-mid: #0d1b5e;
+            --navy-light: #111f6b;
+            --blue-primary: #0cb5f5;
+            --blue-bright: #00aaff;
+            --blue-mid: #2da0e2;
+            --blue-dark: #1a7ec0;
+            --bg-primary: #060a1a;
+            --bg-secondary: #0a1230;
+            --bg-tertiary: #0e1840;
+            --text-primary: #f0f4ff;
+            --text-secondary: #8a9cc7;
+            --text-tertiary: #546190;
+            --accent: var(--blue-primary);
+            --accent-dim: rgba(12, 181, 245, 0.08);
+            --accent-border: rgba(12, 181, 245, 0.18);
+            --accent-glow: rgba(12, 181, 245, 0.04);
+            --border: rgba(140, 170, 255, 0.06);
+            --border-hover: rgba(140, 170, 255, 0.12);
+        }
+
+        html { scroll-behavior: smooth; font-size: 16px; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            padding: 1.25rem 3rem;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(6, 10, 26, 0.85);
+            backdrop-filter: blur(24px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-logo {
+            display: flex; align-items: center; gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .nav-logo-icon { height: 28px; width: auto; }
+
+        .nav-logo-text {
+            font-size: 0.8rem; font-weight: 500;
+            letter-spacing: 0.2em; text-transform: uppercase;
+            color: var(--text-primary);
+        }
+
+        .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+
+        .nav-links a {
+            font-size: 0.75rem; font-weight: 400;
+            letter-spacing: 0.15em; text-transform: uppercase;
+            color: var(--text-tertiary); text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .nav-links a:hover { color: var(--accent); }
+
+        section { padding: 8rem 3rem; max-width: 1200px; margin: 0 auto; }
+
+        .hero {
+            min-height: 100vh; display: flex; flex-direction: column;
+            justify-content: center; padding-top: 6rem; max-width: 900px;
+            position: relative;
+        }
+
+        .hero::before {
+            content: ''; position: absolute; top: 20%; right: -15%;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            pointer-events: none; filter: blur(80px);
+        }
+
+        .hero-eyebrow {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem; font-weight: 300;
+            letter-spacing: 0.3em; text-transform: uppercase;
+            color: var(--accent); margin-bottom: 2rem;
+            opacity: 0; animation: fadeUp 0.8s ease 0.2s forwards;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 300;
+            line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 2rem;
+            opacity: 0; animation: fadeUp 0.8s ease 0.4s forwards;
+        }
+
+        .hero h1 strong {
+            font-weight: 500;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--blue-mid) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-description {
+            font-size: 1.1rem; font-weight: 300; line-height: 1.8;
+            color: var(--text-secondary); max-width: 650px; margin-bottom: 3rem;
+            opacity: 0; animation: fadeUp 0.8s ease 0.6s forwards;
+        }
+
+        .hero-metrics {
+            display: flex; gap: 3rem;
+            opacity: 0; animation: fadeUp 0.8s ease 0.8s forwards;
+        }
+
+        .hero-metric { display: flex; flex-direction: column; gap: 0.3rem; }
+
+        .hero-metric-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.4rem; font-weight: 400; color: var(--text-primary);
+        }
+
+        .hero-metric-label {
+            font-size: 0.7rem; font-weight: 400;
+            letter-spacing: 0.15em; text-transform: uppercase;
+            color: var(--text-tertiary);
+        }
+
+        .divider {
+            width: 100%; max-width: 1200px; margin: 0 auto; height: 1px;
+            background: linear-gradient(90deg, transparent 0%, var(--accent-border) 50%, transparent 100%);
+        }
+
+        .section-grid {
+            display: grid; grid-template-columns: 1fr 1.5fr;
+            gap: 4rem; align-items: start;
+        }
+
+        .section-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem; font-weight: 300;
+            letter-spacing: 0.3em; text-transform: uppercase;
+            color: var(--text-tertiary); position: sticky; top: 8rem;
+        }
+
+        .section-label::before {
+            content: ''; display: inline-block;
+            width: 1.5rem; height: 1px;
+            background: var(--accent); margin-right: 0.75rem;
+            vertical-align: middle;
+        }
+
+        .section-content h2 {
+            font-size: 1.8rem; font-weight: 400; line-height: 1.4;
+            margin-bottom: 1.5rem; letter-spacing: -0.01em;
+        }
+
+        .section-content h3 {
+            font-size: 0.95rem; font-weight: 500;
+            margin-top: 2.5rem; margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .section-content p {
+            font-size: 0.95rem; font-weight: 300; line-height: 1.9;
+            color: var(--text-secondary); margin-bottom: 1rem;
+        }
+
+        .section-content .highlight { color: var(--accent); font-weight: 400; }
+
+        .allocation-grid {
+            margin-top: 2rem; display: flex; flex-direction: column;
+            gap: 1px; background: var(--border);
+            border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+        }
+
+        .allocation-row {
+            display: grid; grid-template-columns: 2.5rem 1fr auto;
+            gap: 1.5rem; padding: 1rem 1.25rem;
+            background: var(--bg-secondary); align-items: center;
+            transition: background 0.2s ease;
+        }
+        .allocation-row:hover { background: var(--bg-tertiary); }
+
+        .allocation-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem; color: var(--accent); font-weight: 400;
+        }
+
+        .allocation-name { font-size: 0.85rem; font-weight: 400; color: var(--text-primary); }
+
+        .allocation-name span {
+            display: block; font-size: 0.75rem; font-weight: 300;
+            color: var(--text-tertiary); margin-top: 0.2rem;
+        }
+
+        .allocation-pct {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem; color: var(--text-secondary);
+            font-weight: 400; text-align: right; white-space: nowrap;
+        }
+
+        .risk-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 1px; background: var(--border);
+            border: 1px solid var(--border); border-radius: 8px;
+            overflow: hidden; margin-top: 2rem;
+        }
+
+        .risk-item { padding: 1.5rem; background: var(--bg-secondary); }
+
+        .risk-item-label {
+            font-size: 0.7rem; font-weight: 400;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            color: var(--text-tertiary); margin-bottom: 0.5rem;
+        }
+
+        .risk-item-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem; color: var(--text-primary);
+        }
+
+        .terms-grid {
+            display: flex; flex-direction: column; gap: 1px;
+            background: var(--border); border: 1px solid var(--border);
+            border-radius: 8px; overflow: hidden;
+        }
+
+        .terms-row {
+            display: grid; grid-template-columns: 1fr 1fr;
+            background: var(--bg-secondary); transition: background 0.2s ease;
+        }
+        .terms-row:hover { background: var(--bg-tertiary); }
+
+        .terms-row-label {
+            padding: 1.25rem 1.5rem; font-size: 0.8rem; font-weight: 400;
+            color: var(--text-tertiary); letter-spacing: 0.05em;
+            border-right: 1px solid var(--border);
+        }
+
+        .terms-row-value {
+            padding: 1.25rem 1.5rem; font-size: 0.85rem;
+            font-weight: 400; color: var(--text-primary);
+        }
+
+        .terms-row-value .sub {
+            display: block; font-size: 0.75rem; font-weight: 300;
+            color: var(--text-tertiary); margin-top: 0.3rem; line-height: 1.5;
+        }
+
+        .contact-email {
+            display: inline-flex; align-items: center; gap: 0.75rem;
+            padding: 0.85rem 1.5rem; border: 1px solid var(--accent-border);
+            border-radius: 6px; background: var(--accent-dim);
+            color: var(--accent); text-decoration: none;
+            font-size: 0.85rem; font-weight: 400; letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+        }
+        .contact-email:hover {
+            background: rgba(12, 181, 245, 0.15);
+            border-color: rgba(12, 181, 245, 0.35);
+            box-shadow: 0 0 30px rgba(12, 181, 245, 0.08);
+        }
+
+        footer {
+            padding: 3rem; border-top: 1px solid var(--border);
+            max-width: 1200px; margin: 0 auto;
+        }
+
+        .footer-content {
+            display: flex; justify-content: space-between; align-items: flex-start;
+        }
+
+        .footer-legal {
+            font-size: 0.7rem; font-weight: 300;
+            color: var(--text-tertiary); line-height: 1.8; max-width: 700px;
+        }
+
+        .footer-right {
+            display: flex; flex-direction: column;
+            align-items: flex-end; gap: 0.5rem;
+        }
+
+        .footer-text { font-size: 0.7rem; color: var(--text-tertiary); }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            opacity: 0; transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 768px) {
+            nav { padding: 1rem 1.5rem; }
+            .nav-links { gap: 1.5rem; }
+            .nav-logo-text { display: none; }
+            section { padding: 5rem 1.5rem; }
+            .hero { padding-top: 4rem; }
+            .hero-metrics { flex-wrap: wrap; gap: 2rem; }
+            .section-grid { grid-template-columns: 1fr; gap: 2rem; }
+            .section-label { position: static; }
+            .risk-grid { grid-template-columns: 1fr; }
+            .allocation-row { grid-template-columns: 2rem 1fr auto; gap: 1rem; }
+            .terms-row { grid-template-columns: 1fr; }
+            .terms-row-label { border-right: none; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+            .footer-content { flex-direction: column; gap: 1.5rem; }
+            .footer-right { align-items: flex-start; }
+        }
+
+        body::after {
+            content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; opacity: 0.012;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            background-repeat: repeat; z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="#" class="nav-logo">
+            <!-- P icon mark - inline SVG approximation of the logo -->
+            <svg class="nav-logo-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="5" y="48" width="28" height="28" rx="2" fill="#0cb5f5" opacity="0.55" transform="rotate(-15 19 62)"/>
+                <rect x="20" y="35" width="28" height="28" rx="2" fill="#0cb5f5" opacity="0.8" transform="rotate(-15 34 49)"/>
+                <path d="M42 20 L70 20 Q90 20 90 42 Q90 64 70 64 L58 64 L58 48 L68 48 Q76 48 76 42 Q76 36 68 36 L42 36 Z" fill="#0cb5f5"/>
+            </svg>
+            <span class="nav-logo-text">Protean</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#strategy">Strategy</a></li>
+            <li><a href="#terms">Terms</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-eyebrow">Protean Asset Management</div>
+        <h1><strong>Managed Convexity.</strong><br>Systematic Edge.</h1>
+        <p class="hero-description">
+            We extract alpha by combining deep fundamental trading and derivative structuring 
+            experience with avant-garde quantitative research — powered by proprietary agentic 
+            AI pattern recognition.
+        </p>
+        <div class="hero-metrics">
+            <div class="hero-metric">
+                <div class="hero-metric-value">&gt; 2.1</div>
+                <div class="hero-metric-label">Target Sortino</div>
+            </div>
+            <div class="hero-metric">
+                <div class="hero-metric-value">&gt; 1.4</div>
+                <div class="hero-metric-label">Target Sharpe</div>
+            </div>
+            <div class="hero-metric">
+                <div class="hero-metric-value">8</div>
+                <div class="hero-metric-label">Allocation Buckets</div>
+            </div>
+            <div class="hero-metric">
+                <div class="hero-metric-value">SPX</div>
+                <div class="hero-metric-label">Benchmark</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <section id="about" class="section-grid fade-in">
+        <div class="section-label">About</div>
+        <div class="section-content">
+            <h2>Adaptive by nature.<br>Disciplined by design.</h2>
+            <p>
+                Protean's proprietary agentic AI pattern recognition algorithm generates a 
+                continuously revised opportunity set for risk-taking while human oversight 
+                ensures tactical decision-making, portfolio balance, and adaptability to 
+                evolving market conditions and regime changes.
+            </p>
+            <p>
+                Our Flagship Managed Convexity Strategy seeks to maximize overall portfolio 
+                convexity and exposure to our AI-generated alphas through daily active 
+                management while minimizing correlation to our benchmark.
+            </p>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <section id="strategy" class="section-grid fade-in">
+        <div class="section-label">Strategy</div>
+        <div class="section-content">
+            <h2>Flagship Managed Convexity</h2>
+            <p>
+                The strategy leverages Protean's agentic AI pattern recognition signals — grounded 
+                in <span class="highlight">Fractional Brownian Motion</span> modeling — to identify 
+                geometric inflection points across global markets and dynamically manage opportunistic 
+                and uncorrelated exposures.
+            </p>
+            <p>
+                Portfolio construction emphasizes bespoke, mixed-duration convexity vehicles, with a 
+                systematic focus on net vega reduction — built to endure the full spectrum of market regimes.
+            </p>
+
+            <h3>Derivative Instrumentation</h3>
+            <p>
+                Debit spreads serve as the primary structure, offering inherent vega mitigation. 
+                Shorter-duration opportunities may utilize outright puts or calls, while orthogonal 
+                positions may employ covered credit spreads for additional net vega reduction.
+            </p>
+
+            <h3>Capital Allocation Framework</h3>
+            <div class="allocation-grid">
+                <div class="allocation-row">
+                    <div class="allocation-num">01</div>
+                    <div class="allocation-name">Opportunistic Long LEAP Convexity<span>Dynamic value-screened, AI momentum signals &amp; continuous monitoring</span></div>
+                    <div class="allocation-pct">40%</div>
+                </div>
+                <div class="allocation-row">
+                    <div class="allocation-num">02</div>
+                    <div class="allocation-name">Single-Name Momentum / Thematic Convexity<span>Fundamental research-driven, variable duration</span></div>
+                    <div class="allocation-pct">0 – 10%</div>
+                </div>
+                <div class="allocation-row">
+                    <div class="allocation-num">03</div>
+                    <div class="allocation-name">Opportunistic Single-Name Short Convexity<span>Same screening process as bucket 1</span></div>
+                    <div class="allocation-pct">0 – 10%</div>
+                </div>
+                <div class="allocation-row">
+                    <div class="allocation-num">04</div>
+                    <div class="allocation-name">Benchmark Long Convexity (SPX)<span>LEAP to intermediate duration</span></div>
+                    <div class="allocation-pct">5 – 10%</div>
+                </div>
+                <div class="allocation-row">
+                    <div class="allocation-num">05</div>
+                    <div class="allocation-name">Macro / CTA Tactical<span>Cross-asset: commodities, fixed income, crypto, BRICS indices</span></div>
+                    <div class="allocation-pct">5%</div>
+                </div>
+                <div class="allocation-row">
+                    <div class="allocation-num">06</div>
+                    <div class="allocation-name">Systemic Downside Protection<span>SPX puts / VIX calls; short to intermediate duration</span></div>
+                    <div class="allocation-pct">0 – 10%</div>
+                </div>
+                <div class="allocation-row">
+                    <div class="allocation-num">07</div>
+                    <div class="allocation-name">Rolling Tail-Risk Hedges<span>Extremely short duration</span></div>
+                    <div class="allocation-pct">0.01%</div>
+                </div>
+                <div class="allocation-row">
+                    <div class="allocation-num">08</div>
+                    <div class="allocation-name">Portfolio Exposure Offset<span>Unconstrained, opportunistic risk-reduction; covered vol selling for net vega reduction</span></div>
+                    <div class="allocation-pct">0 – 14.99%</div>
+                </div>
+            </div>
+
+            <h3>Risk Parameters</h3>
+            <div class="risk-grid">
+                <div class="risk-item">
+                    <div class="risk-item-label">Position Limit</div>
+                    <div class="risk-item-value">3% NAV</div>
+                </div>
+                <div class="risk-item">
+                    <div class="risk-item-label">Concentration Limit</div>
+                    <div class="risk-item-value">15% NAV</div>
+                </div>
+                <div class="risk-item">
+                    <div class="risk-item-label">Cash Allocation</div>
+                    <div class="risk-item-value">Variable</div>
+                </div>
+                <div class="risk-item">
+                    <div class="risk-item-label">Factor Hedge Trigger</div>
+                    <div class="risk-item-value">10% NAV</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <section id="terms" class="section-grid fade-in">
+        <div class="section-label">Terms</div>
+        <div class="section-content">
+            <h2>Fund Terms</h2>
+            <div class="terms-grid">
+                <div class="terms-row">
+                    <div class="terms-row-label">Strategy</div>
+                    <div class="terms-row-value">Flagship Managed Convexity</div>
+                </div>
+                <div class="terms-row">
+                    <div class="terms-row-label">Benchmark</div>
+                    <div class="terms-row-value">S&amp;P 500 (SPX)</div>
+                </div>
+                <div class="terms-row">
+                    <div class="terms-row-label">Management Fee</div>
+                    <div class="terms-row-value">2% of AUM</div>
+                </div>
+                <div class="terms-row">
+                    <div class="terms-row-label">Performance Fee</div>
+                    <div class="terms-row-value">
+                        20% of profits
+                        <span class="sub">Subject to high watermark. Performance fees are only charged on new profits — if the fund declines, prior losses must be fully recovered before performance fees resume.</span>
+                    </div>
+                </div>
+                <div class="terms-row">
+                    <div class="terms-row-label">Target Sortino</div>
+                    <div class="terms-row-value">&gt; 2.1</div>
+                </div>
+                <div class="terms-row">
+                    <div class="terms-row-label">Target Sharpe</div>
+                    <div class="terms-row-value">&gt; 1.4</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <section id="contact" class="section-grid fade-in">
+        <div class="section-label">Contact</div>
+        <div class="section-content">
+            <h2>Investor Inquiries</h2>
+            <p>
+                Protean Asset Management is selectively accepting qualified investors. 
+                For more information on the Flagship Managed Convexity strategy, 
+                please reach out directly.
+            </p>
+            <a href="mailto:investors@proteanam.com" class="contact-email">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="4" width="20" height="16" rx="2"/>
+                    <path d="M22 4L12 13L2 4"/>
+                </svg>
+                investors@proteanam.com
+            </a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-legal">
+                This website is for informational purposes only and does not constitute an offer to sell 
+                or a solicitation of an offer to buy any securities. Any such offer may only be made 
+                pursuant to the fund's Private Placement Memorandum and related subscription documents. 
+                Past performance is not indicative of future results. Investment in hedge funds involves 
+                a high degree of risk and is suitable only for accredited investors.
+                <br><br>
+                &copy; 2026 Protean Asset Management LLC. All rights reserved.
+            </div>
+            <div class="footer-right">
+                <div class="footer-text">Protean Asset Management</div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    </script>
+
+</body>
+</html>
