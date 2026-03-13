@@ -537,9 +537,189 @@
         <div class="section-content">
             <h2>Live Track Record</h2>
             <p style="color:var(--text-secondary);margin-bottom:1.5rem;">Real returns. Real time. No gatekeeping.</p>
-            <div style="width:100%;border-radius:12px;overflow:hidden;border:1px solid rgba(12,181,245,0.12);margin-bottom:1.8rem;">
-                <img src="performance-animation.gif" alt="Protean Flagship Convexity vs SPX — YTD 2026" style="width:100%;display:block;">
+            <div id="perf-chart-container" style="width:100%;border-radius:12px;overflow:hidden;border:1px solid rgba(12,181,245,0.12);margin-bottom:1.8rem;position:relative;background:#0B1121;">
+                <canvas id="perf-canvas" style="width:100%;display:block;"></canvas>
+                <div id="perf-scrubber" style="display:none;position:relative;padding:8px 16px 12px 16px;">
+                    <input type="range" id="perf-slider" min="1" max="71" value="71" style="width:100%;accent-color:#0cb5f5;cursor:pointer;">
+                    <div id="perf-date-label" style="text-align:center;font-size:0.7rem;color:#667799;margin-top:2px;font-family:'JetBrains Mono',monospace;"></div>
+                </div>
+                <div id="perf-footnote" style="text-align:center;padding:4px 0 8px 0;font-size:0.6rem;color:#556677;font-style:italic;">As of March 12, 2026. Past performance is not indicative of future results.</div>
             </div>
+            <script>
+            (function(){
+                const DATA = [
+                    ["1/1/2026",0,0],["1/2/2026",0.19,-2.69],["1/3/2026",0.19,-2.69],["1/4/2026",0.19,-2.69],
+                    ["1/5/2026",0.83,-7.26],["1/6/2026",1.45,2.68],["1/7/2026",1.1,-2.57],["1/8/2026",1.11,8.87],
+                    ["1/9/2026",1.76,11.62],["1/10/2026",1.76,11.62],["1/11/2026",1.76,11.62],["1/12/2026",1.92,3.75],
+                    ["1/13/2026",1.73,8.8],["1/14/2026",1.18,13.54],["1/15/2026",1.45,20.89],["1/16/2026",1.38,17.64],
+                    ["1/17/2026",1.38,17.64],["1/18/2026",1.38,17.64],["1/19/2026",1.38,17.64],["1/20/2026",-0.71,23.85],
+                    ["1/21/2026",0.44,24.58],["1/22/2026",0.99,34.7],["1/23/2026",1.02,35.66],["1/24/2026",1.02,35.66],
+                    ["1/25/2026",1.02,35.66],["1/26/2026",1.53,38.73],["1/27/2026",1.94,24.79],["1/28/2026",1.94,21.72],
+                    ["1/29/2026",1.8,20.6],["1/30/2026",1.37,21.92],["1/31/2026",1.37,21.92],["2/1/2026",1.37,21.92],
+                    ["2/2/2026",1.91,17.88],["2/3/2026",1.06,22.72],["2/4/2026",0.54,45.75],["2/5/2026",-0.69,46.97],
+                    ["2/6/2026",1.27,38.8],["2/7/2026",1.27,38.8],["2/8/2026",1.27,38.8],["2/9/2026",1.74,31.65],
+                    ["2/10/2026",1.41,39.42],["2/11/2026",1.4,41.16],["2/12/2026",-0.19,56.69],["2/13/2026",-0.14,53.89],
+                    ["2/14/2026",-0.14,53.89],["2/15/2026",-0.14,53.89],["2/16/2026",-0.14,53.89],["2/17/2026",-0.03,46.94],
+                    ["2/18/2026",0.52,49.01],["2/19/2026",0.24,45.17],["2/20/2026",0.94,33.84],["2/21/2026",0.94,33.84],
+                    ["2/22/2026",0.94,33.84],["2/23/2026",-0.11,42.11],["2/24/2026",0.65,42.95],["2/25/2026",1.47,38.26],
+                    ["2/26/2026",0.93,39.91],["2/27/2026",0.49,48.2],["2/28/2026",0.49,48.2],["3/1/2026",0.49,48.2],
+                    ["3/2/2026",0.53,38.47],["3/3/2026",-0.42,46.6],["3/4/2026",0.35,39.82],["3/5/2026",-0.22,51.89],
+                    ["3/6/2026",-1.54,66.81],["3/7/2026",-1.54,66.81],["3/8/2026",-1.54,66.81],["3/9/2026",-0.72,49.75],
+                    ["3/10/2026",-0.94,47.47],["3/11/2026",-1.02,42.5],["3/12/2026",-1.02,43.33]
+                ];
+                const canvas = document.getElementById('perf-canvas');
+                const ctx = canvas.getContext('2d');
+                const container = document.getElementById('perf-chart-container');
+                const scrubber = document.getElementById('perf-scrubber');
+                const slider = document.getElementById('perf-slider');
+                const dateLabel = document.getElementById('perf-date-label');
+
+                const PC = '#0cb5f5', SC = '#667799', BG = '#0B1121';
+                let dpr = window.devicePixelRatio || 1;
+                let loops = 0, animFrame = 0, isAnimating = true, scrubberVisible = false, frozen = false;
+
+                function resize(){
+                    const w = container.clientWidth;
+                    const h = Math.round(w * 0.54);
+                    canvas.width = w * dpr; canvas.height = h * dpr;
+                    canvas.style.height = h + 'px';
+                    ctx.setTransform(dpr,0,0,dpr,0,0);
+                }
+                resize(); window.addEventListener('resize', resize);
+
+                function drawChart(n){
+                    const w = canvas.width/dpr, h = canvas.height/dpr;
+                    const pad = {t:50,r:70,b:40,l:55};
+                    const cw = w-pad.l-pad.r, ch = h-pad.t-pad.b;
+
+                    ctx.fillStyle = BG; ctx.fillRect(0,0,w,h);
+
+                    const d = DATA.slice(0,n);
+                    const spx = d.map(r=>r[1]), prt = d.map(r=>r[2]);
+                    const all = spx.concat(prt);
+                    let ymin = Math.min(...all), ymax = Math.max(...all);
+                    let yr = Math.max(ymax-ymin, 3);
+
+                    // Monotonic expansion
+                    if(!drawChart._ymin || ymin < drawChart._ymin) drawChart._ymin = ymin;
+                    if(!drawChart._ymax || ymax > drawChart._ymax) drawChart._ymax = ymax;
+                    ymin = drawChart._ymin; ymax = drawChart._ymax;
+                    yr = Math.max(ymax-ymin, 3);
+                    let ylo = ymin - yr*0.25, yhi = ymax + yr*0.25;
+
+                    // Title
+                    ctx.font = 'bold 14px sans-serif'; ctx.fillStyle = PC;
+                    ctx.fillText('PROTEAN FLAGSHIP MANAGED CONVEXITY', pad.l, 28);
+                    const tw = ctx.measureText('PROTEAN FLAGSHIP MANAGED CONVEXITY').width;
+                    ctx.font = '14px sans-serif'; ctx.fillStyle = '#8899bb';
+                    ctx.fillText('vs SPX — YTD 2026', pad.l + tw + 8, 28);
+
+                    // Grid
+                    ctx.strokeStyle = '#1a2744'; ctx.lineWidth = 0.5;
+                    const yticks = 5;
+                    for(let i=0;i<=yticks;i++){
+                        const y = pad.t + ch*(1-i/yticks);
+                        ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+cw,y); ctx.stroke();
+                        const val = ylo + (yhi-ylo)*i/yticks;
+                        ctx.fillStyle = '#667799'; ctx.font = '10px sans-serif';
+                        ctx.textAlign = 'right';
+                        ctx.fillText(val.toFixed(0)+'%', pad.l-8, y+4);
+                    }
+                    ctx.textAlign = 'left';
+
+                    // Zero line
+                    if(ylo < 0 && yhi > 0){
+                        const zy = pad.t + ch*(1-(0-ylo)/(yhi-ylo));
+                        ctx.strokeStyle = '#2a3a5c'; ctx.lineWidth = 0.8;
+                        ctx.beginPath(); ctx.moveTo(pad.l,zy); ctx.lineTo(pad.l+cw,zy); ctx.stroke();
+                    }
+
+                    function xPos(i){ return pad.l + (i/(n-1||1))*cw; }
+                    function yPos(v){ return pad.t + ch*(1-(v-ylo)/(yhi-ylo)); }
+
+                    // SPX line
+                    ctx.strokeStyle = SC; ctx.lineWidth = 1.5; ctx.setLineDash([6,4]);
+                    ctx.beginPath();
+                    for(let i=0;i<n;i++){ i===0?ctx.moveTo(xPos(i),yPos(spx[i])):ctx.lineTo(xPos(i),yPos(spx[i])); }
+                    ctx.stroke(); ctx.setLineDash([]);
+
+                    // Protean line
+                    ctx.strokeStyle = PC; ctx.lineWidth = 2.5;
+                    ctx.beginPath();
+                    for(let i=0;i<n;i++){ i===0?ctx.moveTo(xPos(i),yPos(prt[i])):ctx.lineTo(xPos(i),yPos(prt[i])); }
+                    ctx.stroke();
+
+                    // Dots
+                    const li = n-1;
+                    ctx.fillStyle = PC; ctx.beginPath(); ctx.arc(xPos(li),yPos(prt[li]),5,0,Math.PI*2); ctx.fill();
+                    ctx.fillStyle = SC; ctx.beginPath(); ctx.arc(xPos(li),yPos(spx[li]),4,0,Math.PI*2); ctx.fill();
+
+                    // Labels
+                    ctx.font = 'bold 11px sans-serif'; ctx.fillStyle = PC;
+                    const plbl = (prt[li]>=0?'+':'')+prt[li].toFixed(1)+'%';
+                    const slbl = (spx[li]>=0?'+':'')+spx[li].toFixed(1)+'%';
+                    let py = yPos(prt[li]), sy = yPos(spx[li]);
+                    if(Math.abs(py-sy)<16){ if(prt[li]>=spx[li]){py-=10;sy+=10;}else{py+=10;sy-=10;} }
+                    ctx.fillText(plbl, xPos(li)+10, py+4);
+                    ctx.font = '10px sans-serif'; ctx.fillStyle = SC;
+                    ctx.fillText(slbl, xPos(li)+10, sy+4);
+
+                    // X-axis dates
+                    ctx.fillStyle = '#667799'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+                    const step = Math.max(1, Math.floor(n/6));
+                    for(let i=0;i<n;i+=step){
+                        const parts = d[i][0].split('/');
+                        const months = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                        ctx.fillText(months[+parts[0]]+' '+parts[1], xPos(i), pad.t+ch+25);
+                    }
+                    ctx.textAlign = 'left';
+
+                    // Legend
+                    ctx.fillStyle = PC; ctx.fillRect(pad.l+5, pad.t+8, 14, 3);
+                    ctx.font = '9px sans-serif'; ctx.fillText('Protean Flagship Managed Convexity', pad.l+24, pad.t+13);
+                    ctx.strokeStyle = SC; ctx.lineWidth = 1.5; ctx.setLineDash([4,3]);
+                    ctx.beginPath(); ctx.moveTo(pad.l+5,pad.t+25); ctx.lineTo(pad.l+19,pad.t+25); ctx.stroke();
+                    ctx.setLineDash([]); ctx.fillStyle = SC; ctx.fillText('SPX', pad.l+24, pad.t+28);
+                }
+
+                slider.max = DATA.length;
+                slider.value = DATA.length;
+                slider.addEventListener('input', function(){
+                    frozen = true; isAnimating = false;
+                    const n = +this.value;
+                    drawChart._ymin = null; drawChart._ymax = null; // reset for scrub
+                    // Rebuild monotonic bounds up to n
+                    for(let i=0;i<n;i++){
+                        const all = DATA.slice(0,i+1).map(r=>[r[1],r[2]]).flat();
+                        const lo = Math.min(...all), hi = Math.max(...all);
+                        if(!drawChart._ymin || lo < drawChart._ymin) drawChart._ymin = lo;
+                        if(!drawChart._ymax || hi > drawChart._ymax) drawChart._ymax = hi;
+                    }
+                    drawChart(n);
+                    dateLabel.textContent = DATA[n-1][0];
+                });
+
+                function animate(){
+                    if(!isAnimating) return;
+                    animFrame++;
+                    const n = Math.min(animFrame + 2, DATA.length);
+                    drawChart(n);
+                    if(n >= DATA.length){
+                        loops++;
+                        if(loops >= 3 && !scrubberVisible){
+                            scrubber.style.display = 'block';
+                            scrubberVisible = true;
+                        }
+                        if(loops < 10){
+                            setTimeout(()=>{ animFrame=0; drawChart._ymin=null; drawChart._ymax=null; requestAnimationFrame(animate); }, 2500);
+                        }
+                        return;
+                    }
+                    setTimeout(()=>requestAnimationFrame(animate), 80);
+                }
+                animate();
+            })();
+            </script>
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1rem;">
                 <div style="text-align:center;padding:1.2rem 0.5rem;background:rgba(12,181,245,0.04);border:1px solid rgba(12,181,245,0.1);border-radius:8px;">
                     <div style="font-size:1.6rem;font-weight:600;color:var(--blue-primary);font-family:'JetBrains Mono',monospace;">2.35</div>
