@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research | Protean Asset Management</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap');
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --navy-deep: #080e27;
+            --blue-primary: #0cb5f5;
+            --bg-primary: #060a1a;
+            --bg-secondary: #0a1230;
+            --bg-tertiary: #0e1840;
+            --text-primary: #f0f4ff;
+            --text-secondary: #8a9cc7;
+            --text-tertiary: #546190;
+            --accent: var(--blue-primary);
+            --accent-dim: rgba(12, 181, 245, 0.08);
+            --accent-border: rgba(12, 181, 245, 0.18);
+            --border: rgba(140, 170, 255, 0.06);
+        }
+
+        html { font-size: 16px; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* ── Nav (mirrors main site) ── */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            padding: 1.25rem 3rem;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(6, 10, 26, 0.85);
+            backdrop-filter: blur(24px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-logo {
+            display: flex; align-items: center; gap: 0.75rem;
+            text-decoration: none;
+        }
+        .nav-logo-icon { height: 28px; width: auto; }
+        .nav-logo-text {
+            font-size: 0.8rem; font-weight: 500;
+            letter-spacing: 0.2em; text-transform: uppercase;
+            color: var(--text-primary);
+        }
+
+        .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+        .nav-links a {
+            font-size: 0.75rem; font-weight: 400;
+            letter-spacing: 0.15em; text-transform: uppercase;
+            color: var(--text-tertiary); text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+
+        /* ── Page layout ── */
+        .page-header {
+            padding: 8rem 3rem 3rem;
+            max-width: 1200px; margin: 0 auto;
+        }
+        .page-header .eyebrow {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem; font-weight: 300;
+            letter-spacing: 0.3em; text-transform: uppercase;
+            color: var(--accent); margin-bottom: 1rem;
+        }
+        .page-header h1 {
+            font-size: clamp(2rem, 4vw, 3rem); font-weight: 300;
+            line-height: 1.2; letter-spacing: -0.02em; margin-bottom: 1rem;
+        }
+        .page-header h1 strong {
+            font-weight: 500;
+            background: linear-gradient(135deg, var(--text-primary) 0%, #2da0e2 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .page-header p {
+            font-size: 1rem; font-weight: 300; line-height: 1.8;
+            color: var(--text-secondary); max-width: 700px;
+        }
+
+        .divider {
+            width: 100%; max-width: 1200px; margin: 0 auto; height: 1px;
+            background: linear-gradient(90deg, transparent 0%, var(--accent-border) 50%, transparent 100%);
+        }
+
+        /* ── Research cards ── */
+        .research-section {
+            padding: 4rem 3rem; max-width: 1200px; margin: 0 auto;
+        }
+        .research-section .section-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem; font-weight: 300;
+            letter-spacing: 0.3em; text-transform: uppercase;
+            color: var(--text-tertiary); margin-bottom: 2rem;
+        }
+        .research-section .section-title::before {
+            content: ''; display: inline-block;
+            width: 1.5rem; height: 1px;
+            background: var(--accent); margin-right: 0.75rem;
+            vertical-align: middle;
+        }
+
+        .research-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 3rem;
+            transition: border-color 0.3s ease;
+        }
+        .research-card:hover { border-color: var(--accent-border); }
+
+        .card-header {
+            padding: 2rem 2.5rem 1rem;
+            display: flex; align-items: center; gap: 1rem;
+        }
+        .card-emoji { font-size: 1.6rem; }
+        .card-title {
+            font-size: 1.3rem; font-weight: 400;
+            letter-spacing: -0.01em;
+        }
+        .card-subtitle {
+            padding: 0 2.5rem 1.5rem;
+            font-size: 0.85rem; font-weight: 300;
+            color: var(--text-secondary); line-height: 1.7;
+        }
+
+        .card-chart {
+            width: 100%; border-top: 1px solid var(--border);
+        }
+        .card-chart iframe {
+            width: 100%; border: none; display: block;
+            min-height: 560px;
+        }
+
+        /* ── Product grid ── */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        .product-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.8rem 2rem;
+            transition: border-color 0.3s ease, transform 0.2s ease;
+        }
+        .product-card:hover {
+            border-color: var(--accent-border);
+            transform: translateY(-2px);
+        }
+        .product-emoji { font-size: 1.4rem; margin-bottom: 0.8rem; }
+        .product-name {
+            font-size: 1rem; font-weight: 500;
+            margin-bottom: 0.5rem; color: var(--text-primary);
+        }
+        .product-desc {
+            font-size: 0.82rem; font-weight: 300;
+            color: var(--text-secondary); line-height: 1.7;
+        }
+        .product-tag {
+            display: inline-block; margin-top: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem; font-weight: 300;
+            letter-spacing: 0.15em; text-transform: uppercase;
+            color: var(--accent); padding: 0.25rem 0.6rem;
+            border: 1px solid var(--accent-border);
+            border-radius: 4px;
+        }
+
+        /* ── Footer ── */
+        .footer {
+            padding: 3rem;
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--text-tertiary);
+            border-top: 1px solid var(--border);
+            margin-top: 4rem;
+        }
+        .footer a { color: var(--accent); text-decoration: none; }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            nav { padding: 1rem 1.5rem; }
+            .nav-links { gap: 1.5rem; }
+            .nav-logo-text { display: none; }
+            .page-header { padding: 7rem 1.5rem 2rem; }
+            .research-section { padding: 3rem 1.5rem; }
+            .card-header { padding: 1.5rem 1.5rem 0.8rem; }
+            .card-subtitle { padding: 0 1.5rem 1.2rem; }
+            .product-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="nav-logo">
+            <svg class="nav-logo-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="5" y="48" width="28" height="28" rx="2" fill="#0cb5f5" opacity="0.55" transform="rotate(-15 19 62)"/>
+                <rect x="20" y="35" width="28" height="28" rx="2" fill="#0cb5f5" opacity="0.8" transform="rotate(-15 34 49)"/>
+                <path d="M42 20 L70 20 Q90 20 90 42 Q90 64 70 64 L58 64 L58 48 L68 48 Q76 48 76 42 Q76 36 68 36 L42 36 Z" fill="#0cb5f5"/>
+            </svg>
+            <span class="nav-logo-text">Protean</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html#about">About</a></li>
+            <li><a href="index.html#strategy">Strategy</a></li>
+            <li><a href="research.html" class="active">Research</a></li>
+            <li><a href="index.html#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <div class="page-header">
+        <div class="eyebrow">Proprietary Research</div>
+        <h1><strong>Research &amp; Models</strong></h1>
+        <p>
+            Protean's research framework combines proprietary quantitative models, 
+            derivative flow analysis, and macro regime classification to generate 
+            actionable intelligence with measurable predictive power.
+        </p>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ── Featured: CPDP Model ── -->
+    <div class="research-section">
+        <div class="section-title">Featured Model</div>
+
+        <div class="research-card">
+            <div class="card-header">
+                <span class="card-emoji">📡</span>
+                <span class="card-title">CPDP Model — 16-Month PCE Leading Indicator</span>
+            </div>
+            <div class="card-subtitle">
+                The Lazar CPDP (Consumer Price Dynamics Predictor) model identifies structural inflection 
+                points in personal consumption expenditure inflation with a 16-month forward lead. 
+                74.1% correlation to realized PCE with R² of 54.9% — currently projecting PCE 
+                re-acceleration toward 3.40% by mid-2027.
+            </div>
+            <div class="card-chart">
+                <iframe src="cpdp.html" loading="lazy"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ── Research Suite ── -->
+    <div class="research-section">
+        <div class="section-title">Protean Research Suite</div>
+
+        <div class="product-grid">
+            <div class="product-card">
+                <div class="product-emoji">☀️</div>
+                <div class="product-name">Daily Flash</div>
+                <div class="product-desc">
+                    Pre-market macro pulse — 5 key themes with positioning implications. 
+                    Delivered daily at 8:45 AM EST before the opening bell.
+                </div>
+                <span class="product-tag">Daily</span>
+            </div>
+
+            <div class="product-card">
+                <div class="product-emoji">🎯</div>
+                <div class="product-name">Dealer Gamma</div>
+                <div class="product-desc">
+                    Unified SPY + SPX dealer gamma mapping — retail vs institutional flow synthesis. 
+                    Single-name reports with strike-level unusual activity breakdowns.
+                </div>
+                <span class="product-tag">On-Demand</span>
+            </div>
+
+            <div class="product-card">
+                <div class="product-emoji">🧠</div>
+                <div class="product-name">Smart Money Monitor</div>
+                <div class="product-desc">
+                    Quarterly 13F institutional activity tracker — new positions, exits, 
+                    and concentration shifts from top allocators and activist investors.
+                </div>
+                <span class="product-tag">Quarterly</span>
+            </div>
+
+            <div class="product-card">
+                <div class="product-emoji">📡</div>
+                <div class="product-name">Divergence Monitor</div>
+                <div class="product-desc">
+                    Sentiment vs. fundamentals dislocation screener — identifies names where 
+                    positioning diverges from underlying value, creating asymmetric opportunities.
+                </div>
+                <span class="product-tag">Weekly</span>
+            </div>
+
+            <div class="product-card">
+                <div class="product-emoji">🪤</div>
+                <div class="product-name">Value Trap Monitor</div>
+                <div class="product-desc">
+                    Dividend and yield trap screener — flags high-yield names at risk of 
+                    distribution cuts with safer alternative positioning.
+                </div>
+                <span class="product-tag">Weekly</span>
+            </div>
+
+            <div class="product-card">
+                <div class="product-emoji">📊</div>
+                <div class="product-name">Options Flow Analyzer</div>
+                <div class="product-desc">
+                    Unusual options activity detection with optimal structure recommendations — 
+                    every trade broken out by strike and expiry.
+                </div>
+                <span class="product-tag">On-Demand</span>
+            </div>
+
+            <div class="product-card">
+                <div class="product-emoji">🔄</div>
+                <div class="product-name">Regime Monitor</div>
+                <div class="product-desc">
+                    Macro regime classification with historical analogue matching — 
+                    identifies which sectors and assets outperform in the current environment.
+                </div>
+                <span class="product-tag">Weekly</span>
+            </div>
+
+            <div class="product-card">
+                <div class="product-emoji">🏛️</div>
+                <div class="product-name">Policy &amp; Politics Monitor</div>
+                <div class="product-desc">
+                    Top 5 domestic + top 5 geopolitical developments with direct market 
+                    impact assessment and positioning implications.
+                </div>
+                <span class="product-tag">Weekly</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        © 2026 Protean Asset Management LLC. All rights reserved.<br>
+        <a href="index.html">← Back to Home</a>
+    </div>
+
+</body>
+</html>
