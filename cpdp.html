@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#060a1a; font-family:'Inter','Segoe UI',sans-serif; }
+.container { max-width:900px; margin:40px auto; padding:0 20px; }
+h2 { color:#e1ebf8; font-size:1.3rem; margin-bottom:4px; }
+.subtitle { color:#667799; font-size:0.8rem; margin-bottom:16px; }
+.chart-wrap { position:relative; border-radius:12px; overflow:hidden; border:1px solid rgba(12,181,245,0.12); background:#0B1121; }
+canvas { width:100%; display:block; cursor:crosshair; }
+.scrubber { padding:8px 16px 12px; display:none; }
+.scrubber input { width:100%; accent-color:#0cb5f5; cursor:pointer; }
+.date-label { text-align:center; font-size:0.7rem; color:#667799; margin-top:2px; font-family:'JetBrains Mono',monospace; }
+.stats { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-top:1rem; }
+.stat-box { text-align:center; padding:1rem 0.5rem; background:rgba(12,181,245,0.04); border:1px solid rgba(12,181,245,0.1); border-radius:8px; }
+.stat-val { font-size:1.4rem; font-weight:600; color:#0cb5f5; font-family:'JetBrains Mono',monospace; }
+.stat-lbl { font-size:0.7rem; color:#667799; margin-top:0.3rem; letter-spacing:0.06em; text-transform:uppercase; }
+.footnote { text-align:center; padding:6px 0 10px; font-size:0.6rem; color:#556677; font-style:italic; }
+.legend { display:flex; gap:24px; justify-content:center; padding:8px 0; }
+.legend-item { display:flex; align-items:center; gap:6px; font-size:0.75rem; color:#aabbcc; }
+.legend-line { width:20px; height:3px; border-radius:2px; }
+</style>
+</head>
+<body>
+<div class="container">
+<h2>CPDP Model vs PCE — 16-Month Leading Indicator</h2>
+<div class="subtitle">Lazar CPDP Model (16mo lag) vs PCE CY/OY Index | Proprietary Framework</div>
+<div class="chart-wrap">
+<canvas id="cpdp-canvas"></canvas>
+<div class="legend">
+  <div class="legend-item"><div class="legend-line" style="background:#e1ebf8;"></div>PCE CY/OY Index (LHS)</div>
+  <div class="legend-item"><div class="legend-line" style="background:#0cb5f5;"></div>Lazar CPDP Model 16mo Lag (RHS)</div>
+  <div class="legend-item"><div class="legend-line" style="background:#ff4466; border:1px dashed #ff4466; height:0; border-top-width:2px;"></div>CPDP Forward Projection</div>
+</div>
+<div class="scrubber" id="scrubber">
+  <input type="range" id="slider" min="1" max="100" value="100">
+  <div class="date-label" id="date-label"></div>
+</div>
+<div class="footnote">Correlation = 74.1% | R² = 54.9% | Proprietary CPDP Framework © Protean Asset Management</div>
+</div>
+<div class="stats">
+  <div class="stat-box"><div class="stat-val">74.1%</div><div class="stat-lbl">Correlation</div></div>
+  <div class="stat-box"><div class="stat-val">54.9%</div><div class="stat-lbl">R-Squared</div></div>
+  <div class="stat-box"><div class="stat-val">3.40%</div><div class="stat-lbl">PCE Target (Model)</div></div>
+</div>
+</div>
+<script>
+(function(){
+// Approximate data extracted from the CPDP chart (quarterly from 2015 to 2025)
+// [date, PCE_LHS, CPDP_RHS]
+const DATA = [
+  ["9/30/2015", 1.40, 0.80],["12/31/2015", 1.30, 0.90],
+  ["3/31/2016", 1.00, 0.70],["6/30/2016", 1.00, 0.50],["9/30/2016", 1.20, 0.40],["12/31/2016", 1.80, 0.60],
+  ["3/31/2017", 1.90, 0.80],["6/30/2017", 1.50, 1.00],["9/30/2017", 1.60, 1.10],["12/31/2017", 1.80, 1.30],
+  ["3/31/2018", 2.00, 1.60],["6/30/2018", 2.20, 1.90],["9/30/2018", 2.10, 2.10],["12/31/2018", 1.90, 1.80],
+  ["3/31/2019", 1.50, 1.40],["6/30/2019", 1.60, 1.10],["9/30/2019", 1.40, 0.90],["12/31/2019", 1.60, 0.80],
+  ["3/31/2020", 1.30, 0.50],["6/30/2020", 0.90, 0.20],["9/30/2020", 1.20, 0.30],["12/31/2020", 1.30, 0.60],
+  ["3/31/2021", 1.90, 1.40],["6/30/2021", 3.50, 2.80],["9/30/2021", 4.40, 3.80],["12/31/2021", 5.40, 4.60],
+  ["3/31/2022", 5.20, 4.90],["6/30/2022", 4.80, 4.40],["9/30/2022", 4.30, 3.60],["12/31/2022", 3.90, 2.80],
+  ["3/31/2023", 3.40, 2.10],["6/30/2023", 3.10, 1.60],["9/30/2023", 2.90, 1.20],["12/31/2023", 2.60, 0.80],
+  ["3/31/2024", 2.50, 0.60],["6/30/2024", 2.40, 0.70],["9/30/2024", 2.30, 0.90],["12/31/2024", 2.20, 1.20],
+  ["3/31/2025", 2.10, 1.60],["6/30/2025", 2.20, 2.00],["9/30/2025", 2.40, 2.40],
+  // Projection zone (CPDP model forward, PCE = null for projection)
+  ["12/31/2025", 2.60, 2.70],["3/31/2026", 2.80, 2.90],["6/30/2026", null, 3.10],["9/30/2026", null, 3.40]
+];
+
+const projStart = 41; // index where PCE becomes null (projection zone)
+
+const canvas = document.getElementById('cpdp-canvas');
+const ctx = canvas.getContext('2d');
+const scrubberEl = document.getElementById('scrubber');
+const slider = document.getElementById('slider');
+const dateLabel = document.getElementById('date-label');
+
+const PC = '#0cb5f5', WHITE = '#e1ebf8', PROJ = '#ff4466', BG = '#0B1121';
+let dpr = window.devicePixelRatio || 1;
+let loops = 0, animFrame = 0, isAnimating = true, scrubberVisible = false;
+
+function resize(){
+    const w = canvas.parentElement.clientWidth;
+    const h = Math.round(w * 0.48);
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    canvas.style.height = h + 'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+resize(); window.addEventListener('resize', ()=>{ resize(); drawChart(lastN||DATA.length); });
+
+let lastN = DATA.length;
+slider.max = DATA.length;
+slider.value = DATA.length;
+
+function drawChart(n){
+    lastN = n;
+    const w = canvas.width/dpr, h = canvas.height/dpr;
+    const pad = {t:45,r:65,b:45,l:60};
+    const cw = w-pad.l-pad.r, ch = h-pad.t-pad.b;
+
+    ctx.fillStyle = BG; ctx.fillRect(0,0,w,h);
+
+    const d = DATA.slice(0,n);
+    const pce = d.map(r=>r[1]).filter(v=>v!==null);
+    const cpdp = d.map(r=>r[2]);
+
+    // Y axes
+    const pceMin = 0.5, pceMax = 5.8;
+    const cpdpMin = -0.1, cpdpMax = 5.2;
+
+    // Title
+    ctx.font = 'bold 13px sans-serif'; ctx.fillStyle = WHITE;
+    ctx.fillText('CPDP MODEL vs PCE', pad.l, 24);
+    const tw = ctx.measureText('CPDP MODEL vs PCE').width;
+    ctx.font = '13px sans-serif'; ctx.fillStyle = '#8899bb';
+    ctx.fillText('— 16-Month Leading Indicator', pad.l + tw + 8, 24);
+
+    // Grid
+    ctx.strokeStyle = '#1a2744'; ctx.lineWidth = 0.5;
+    const yticks = 6;
+    for(let i=0;i<=yticks;i++){
+        const y = pad.t + ch*(1-i/yticks);
+        ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+cw,y); ctx.stroke();
+        // LHS (PCE)
+        const pv = pceMin + (pceMax-pceMin)*i/yticks;
+        ctx.fillStyle = '#aabbcc'; ctx.font = '10px sans-serif'; ctx.textAlign = 'right';
+        ctx.fillText(pv.toFixed(1)+'%', pad.l-8, y+4);
+        // RHS (CPDP)
+        const cv = cpdpMin + (cpdpMax-cpdpMin)*i/yticks;
+        ctx.textAlign = 'left';
+        ctx.fillStyle = PC;
+        ctx.fillText(cv.toFixed(1), w-pad.r+8, y+4);
+    }
+    ctx.textAlign = 'left';
+
+    function xPos(i){ return pad.l + (i/(n-1||1))*cw; }
+    function yPce(v){ return pad.t + ch*(1-(v-pceMin)/(pceMax-pceMin)); }
+    function yCpdp(v){ return pad.t + ch*(1-(v-cpdpMin)/(cpdpMax-cpdpMin)); }
+
+    // Projection zone shading
+    if(n > projStart){
+        const px = xPos(projStart);
+        ctx.fillStyle = 'rgba(255,68,102,0.04)';
+        ctx.fillRect(px, pad.t, pad.l+cw-px, ch);
+        ctx.strokeStyle = 'rgba(255,68,102,0.2)'; ctx.lineWidth = 1;
+        ctx.setLineDash([4,4]);
+        ctx.beginPath(); ctx.moveTo(px,pad.t); ctx.lineTo(px,pad.t+ch); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = 'rgba(255,68,102,0.5)'; ctx.font = '9px sans-serif';
+        ctx.fillText('PROJECTION', px+6, pad.t+14);
+    }
+
+    // PCE line (solid white)
+    ctx.strokeStyle = WHITE; ctx.lineWidth = 2;
+    ctx.beginPath();
+    let started = false;
+    for(let i=0;i<n;i++){
+        if(d[i][1]===null) continue;
+        const x = xPos(i), y = yPce(d[i][1]);
+        if(!started){ ctx.moveTo(x,y); started=true; } else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+
+    // CPDP line — solid for historical, dashed for projection
+    ctx.strokeStyle = PC; ctx.lineWidth = 2;
+    ctx.beginPath();
+    for(let i=0;i<Math.min(n,projStart+1);i++){
+        const x = xPos(i), y = yCpdp(d[i][2]);
+        i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+
+    if(n > projStart){
+        ctx.strokeStyle = PROJ; ctx.lineWidth = 2; ctx.setLineDash([6,4]);
+        ctx.beginPath();
+        ctx.moveTo(xPos(projStart), yCpdp(d[projStart][2]));
+        for(let i=projStart+1;i<n;i++){
+            ctx.lineTo(xPos(i), yCpdp(d[i][2]));
+        }
+        ctx.stroke(); ctx.setLineDash([]);
+    }
+
+    // End dots + labels
+    const li = n-1;
+    if(d[li][1]!==null){
+        ctx.fillStyle = WHITE; ctx.beginPath(); ctx.arc(xPos(li),yPce(d[li][1]),4,0,Math.PI*2); ctx.fill();
+        ctx.font = 'bold 10px sans-serif'; ctx.fillStyle = WHITE;
+        ctx.fillText(d[li][1].toFixed(1)+'%', xPos(li)+8, yPce(d[li][1])-6);
+    }
+    ctx.fillStyle = n>projStart?PROJ:PC; ctx.beginPath(); ctx.arc(xPos(li),yCpdp(d[li][2]),4,0,Math.PI*2); ctx.fill();
+    ctx.font = 'bold 10px sans-serif';
+    ctx.fillText(d[li][2].toFixed(2), xPos(li)+8, yCpdp(d[li][2])-6);
+
+    // 3.40% target callout
+    if(n >= DATA.length){
+        const tx = xPos(DATA.length-1), ty = yCpdp(3.40);
+        ctx.strokeStyle = PROJ; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(tx,ty,12,0,Math.PI*2); ctx.stroke();
+        ctx.fillStyle = PROJ; ctx.font = 'bold 11px sans-serif';
+        ctx.fillText('3.40%', tx-40, ty-18);
+    }
+
+    // X-axis dates
+    ctx.fillStyle = '#667799'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+    const step = Math.max(1, Math.floor(n/8));
+    for(let i=0;i<n;i+=step){
+        const parts = d[i][0].split('/');
+        const months = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        const yr = parts[2].slice(-2);
+        ctx.fillText(months[+parts[0]]+" '"+yr, xPos(i), pad.t+ch+22);
+    }
+    ctx.textAlign = 'left';
+
+    // Axis labels
+    ctx.save(); ctx.translate(14, pad.t+ch/2); ctx.rotate(-Math.PI/2);
+    ctx.fillStyle = '#aabbcc'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('PCE CY/OY (%)', 0, 0); ctx.restore();
+
+    ctx.save(); ctx.translate(w-8, pad.t+ch/2); ctx.rotate(Math.PI/2);
+    ctx.fillStyle = PC; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('CPDP Index', 0, 0); ctx.restore();
+}
+
+// Hover tooltip
+canvas.addEventListener('mousemove', function(e){
+    if(isAnimating) return;
+    const rect = canvas.getBoundingClientRect();
+    const mx = (e.clientX - rect.left);
+    const w = rect.width;
+    const pad = {l:60, r:65};
+    const cw = w - pad.l - pad.r;
+    const idx = Math.round(((mx - pad.l) / cw) * (lastN-1));
+    if(idx >= 0 && idx < lastN){
+        drawChart(lastN);
+        const d = DATA[idx];
+        const x = pad.l + (idx/(lastN-1||1))*cw;
+        const h = canvas.height/dpr;
+        ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(x,45); ctx.lineTo(x,h-45); ctx.stroke();
+        ctx.fillStyle = 'rgba(11,17,33,0.9)'; ctx.fillRect(x+8, 50, 145, 48);
+        ctx.strokeStyle = 'rgba(12,181,245,0.3)'; ctx.strokeRect(x+8, 50, 145, 48);
+        ctx.font = '10px sans-serif'; ctx.fillStyle = '#e1ebf8';
+        ctx.fillText(d[0], x+14, 66);
+        ctx.fillStyle = '#aabbcc';
+        ctx.fillText('PCE: '+(d[1]!==null?d[1].toFixed(2)+'%':'—'), x+14, 80);
+        ctx.fillStyle = PC;
+        ctx.fillText('CPDP: '+d[2].toFixed(2), x+14, 92);
+    }
+});
+
+slider.addEventListener('input', function(){
+    isAnimating = false;
+    const n = +this.value;
+    drawChart(n);
+    dateLabel.textContent = DATA[n-1][0];
+});
+
+function animate(){
+    if(!isAnimating) return;
+    animFrame++;
+    const n = Math.min(animFrame, DATA.length);
+    drawChart(n);
+    if(n >= DATA.length){
+        loops++;
+        if(loops >= 3 && !scrubberVisible){
+            scrubberEl.style.display = 'block';
+            scrubberVisible = true;
+        }
+        if(loops < 8){
+            setTimeout(()=>{ animFrame=0; requestAnimationFrame(animate); }, 2500);
+        }
+        return;
+    }
+    setTimeout(()=>requestAnimationFrame(animate), 100);
+}
+animate();
+})();
+</script>
+</body>
+</html>
