@@ -182,7 +182,7 @@
                 <div class="chart-legend">
                     <div class="legend-item"><div class="legend-line" style="background:#e1ebf8;"></div>PCE CY/OY Index (LHS)</div>
                     <div class="legend-item"><div class="legend-line" style="background:#0cb5f5;"></div>Lazar CPDP Model 16mo Lag (RHS)</div>
-                    <div class="legend-item"><div class="legend-line" style="background:#ff4466;border:none;height:0;border-top:2px dashed #ff4466;width:20px;"></div>CPDP Forward Projection</div>
+                    <div class="legend-item"><div class="legend-line" style="background:#ff4466;border:none;height:0;border-top:2px dashed #ff4466;width:20px;"></div>PCE Projection</div>
                                     </div>
                 <div class="chart-scrubber" id="scrubber">
                     <input type="range" id="slider" min="1" max="140" value="140">
@@ -450,13 +450,31 @@ function drawChart(n){
     }
     ctx.stroke();
 
-    // CPDP projection
-    if(n>PROJ_START){
-        ctx.strokeStyle=PROJ; ctx.lineWidth=2; ctx.setLineDash([6,4]);
-        ctx.beginPath(); ctx.moveTo(xPos(PROJ_START),yCpdp(d[PROJ_START][2]));
-        for(let i=PROJ_START+1;i<n;i++) ctx.lineTo(xPos(i),yCpdp(d[i][2]));
-        ctx.stroke(); ctx.setLineDash([]);
+
+    // PCE projection (red dotted) - short line showing where PCE is heading
+    ctx.strokeStyle=PROJ; ctx.lineWidth=2; ctx.setLineDash([3,4]);
+    ctx.beginPath(); let pceStarted=false;
+    for(let i=0;i<n;i++){
+        if(d[i][3]===null) continue;
+        const x=xPos(i),y=yPce(d[i][3]);
+        if(!pceStarted){ ctx.moveTo(x,y); pceStarted=true; } else ctx.lineTo(x,y);
     }
+    ctx.stroke(); ctx.setLineDash([]);
+    // 3.40% label on PCE projection end
+    if(n>=DATA.length){
+        const lastModel=DATA.filter(r=>r[3]!==null);
+        if(lastModel.length>0){
+            const lm=lastModel[lastModel.length-1];
+            const lmIdx=DATA.indexOf(lm);
+            if(lmIdx<n){
+                const lx=xPos(lmIdx), ly=yPce(lm[3]);
+                ctx.fillStyle=PROJ; ctx.font='bold 10px sans-serif';
+                ctx.fillText('3.40%',lx+8,ly-6);
+            }
+        }
+    }
+
+
 
 
     // End dots
@@ -467,8 +485,8 @@ function drawChart(n){
         ctx.fillText(d[li][1].toFixed(2)+'%',xPos(li)+8,yPce(d[li][1])-6);
     }
     if(d[li][2]!==null){
-        ctx.fillStyle=n>PROJ_START?PROJ:PC; ctx.beginPath(); ctx.arc(xPos(li),yCpdp(d[li][2]),4,0,Math.PI*2); ctx.fill();
-        ctx.font='bold 10px sans-serif'; ctx.fillStyle=n>PROJ_START?PROJ:PC;
+        ctx.fillStyle=PC; ctx.beginPath(); ctx.arc(xPos(li),yCpdp(d[li][2]),4,0,Math.PI*2); ctx.fill();
+        ctx.font='bold 10px sans-serif'; ctx.fillStyle=PC;
         ctx.fillText(d[li][2].toFixed(2),xPos(li)+8,yCpdp(d[li][2])-6);
     }
 
