@@ -3,355 +3,593 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Research | Protean Asset Management</title>
+    <title>Research — Protean Asset Management</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap');
-
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
         :root {
-            --navy-deep: #080e27;
-            --blue-primary: #0cb5f5;
-            --bg-primary: #060a1a;
-            --bg-secondary: #0a1230;
-            --bg-tertiary: #0e1840;
-            --text-primary: #f0f4ff;
-            --text-secondary: #8a9cc7;
-            --text-tertiary: #546190;
-            --accent: var(--blue-primary);
-            --accent-dim: rgba(12, 181, 245, 0.08);
-            --accent-border: rgba(12, 181, 245, 0.18);
-            --border: rgba(140, 170, 255, 0.06);
+            --bg-primary: #060a1a; --bg-card: #0B1121; --blue-primary: #0cb5f5;
+            --text-primary: #f0f4ff; --text-secondary: #8a9cc7; --text-tertiary: #546190;
+            --accent-border: rgba(12,181,245,0.18); --border: rgba(140,170,255,0.06);
         }
-
-        html { font-size: 16px; }
-
+        html { scroll-behavior: smooth; font-size: 16px; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
+            background: var(--bg-primary); color: var(--text-primary);
+            line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden;
         }
-
-        /* ── Nav (mirrors main site) ── */
         nav {
             position: fixed; top: 0; left: 0; right: 0; z-index: 100;
             padding: 1.25rem 3rem;
             display: flex; justify-content: space-between; align-items: center;
-            background: rgba(6, 10, 26, 0.85);
-            backdrop-filter: blur(24px);
+            background: rgba(6,10,26,0.85); backdrop-filter: blur(24px);
             border-bottom: 1px solid var(--border);
         }
-
-        .nav-logo {
-            display: flex; align-items: center; gap: 0.75rem;
-            text-decoration: none;
-        }
+        .nav-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
         .nav-logo-icon { height: 28px; width: auto; }
         .nav-logo-text {
-            font-size: 0.8rem; font-weight: 500;
-            letter-spacing: 0.2em; text-transform: uppercase;
-            color: var(--text-primary);
+            font-size: 0.8rem; font-weight: 500; letter-spacing: 0.2em;
+            text-transform: uppercase; color: var(--text-primary);
         }
-
         .nav-links { display: flex; gap: 2.5rem; list-style: none; }
         .nav-links a {
-            font-size: 0.75rem; font-weight: 400;
-            letter-spacing: 0.15em; text-transform: uppercase;
-            color: var(--text-tertiary); text-decoration: none;
-            transition: color 0.3s ease;
+            font-size: 0.75rem; font-weight: 400; letter-spacing: 0.15em;
+            text-transform: uppercase; color: var(--text-tertiary);
+            text-decoration: none; transition: color 0.3s ease;
         }
-        .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+        .nav-links a:hover { color: var(--blue-primary); }
+        .nav-links a.active { color: var(--blue-primary); }
 
-        /* ── Page layout ── */
-        .page-header {
-            padding: 8rem 3rem 3rem;
-            max-width: 1200px; margin: 0 auto;
+        .page { max-width: 1100px; margin: 0 auto; padding: 7rem 2rem 4rem; }
+        .page-header { margin-bottom: 3rem; opacity: 0; animation: fadeUp 0.8s ease 0.2s forwards; }
+        .page-eyebrow {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 300;
+            letter-spacing: 0.3em; text-transform: uppercase; color: var(--blue-primary); margin-bottom: 1rem;
         }
-        .page-header .eyebrow {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem; font-weight: 300;
-            letter-spacing: 0.3em; text-transform: uppercase;
-            color: var(--accent); margin-bottom: 1rem;
-        }
-        .page-header h1 {
-            font-size: clamp(2rem, 4vw, 3rem); font-weight: 300;
+        .page-title {
+            font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 300;
             line-height: 1.2; letter-spacing: -0.02em; margin-bottom: 1rem;
         }
-        .page-header h1 strong {
+        .page-title strong {
             font-weight: 500;
             background: linear-gradient(135deg, var(--text-primary) 0%, #2da0e2 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
         }
-        .page-header p {
+        .page-desc {
             font-size: 1rem; font-weight: 300; line-height: 1.8;
             color: var(--text-secondary); max-width: 700px;
         }
 
-        .divider {
-            width: 100%; max-width: 1200px; margin: 0 auto; height: 1px;
-            background: linear-gradient(90deg, transparent 0%, var(--accent-border) 50%, transparent 100%);
-        }
-
-        /* ── Research cards ── */
-        .research-section {
-            padding: 4rem 3rem; max-width: 1200px; margin: 0 auto;
-        }
-        .research-section .section-title {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem; font-weight: 300;
-            letter-spacing: 0.3em; text-transform: uppercase;
-            color: var(--text-tertiary); margin-bottom: 2rem;
-        }
-        .research-section .section-title::before {
-            content: ''; display: inline-block;
-            width: 1.5rem; height: 1px;
-            background: var(--accent); margin-right: 0.75rem;
-            vertical-align: middle;
-        }
-
         .research-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 3rem;
-            transition: border-color 0.3s ease;
+            background: var(--bg-card); border: 1px solid var(--accent-border);
+            border-radius: 16px; margin-bottom: 3rem; overflow: hidden;
+            opacity: 0; animation: fadeUp 0.8s ease 0.4s forwards;
         }
-        .research-card:hover { border-color: var(--accent-border); }
+        .card-header { padding: 1.5rem 2rem 1rem; border-bottom: 1px solid rgba(12,181,245,0.08); }
+        .card-tag {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; font-weight: 300;
+            letter-spacing: 0.2em; text-transform: uppercase; color: var(--blue-primary); margin-bottom: 0.5rem;
+        }
+        .card-title { font-size: 1.3rem; font-weight: 400; letter-spacing: -0.01em; }
+        .card-subtitle { font-size: 0.8rem; color: var(--text-tertiary); margin-top: 0.3rem; }
+        .card-body { padding: 0; }
 
-        .card-header {
-            padding: 2rem 2.5rem 1rem;
-            display: flex; align-items: center; gap: 1rem;
+        .chart-embed { position: relative; width: 100%; background: var(--bg-card); }
+        .chart-embed canvas { width: 100%; display: block; cursor: crosshair; }
+        .chart-legend { display: flex; gap: 24px; justify-content: center; padding: 10px 0; flex-wrap: wrap; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: #aabbcc; }
+        .legend-line { width: 20px; height: 3px; border-radius: 2px; }
+        .chart-scrubber { padding: 8px 16px 12px; display: none; }
+        .chart-scrubber input { width: 100%; accent-color: var(--blue-primary); cursor: pointer; }
+        .date-label {
+            text-align: center; font-size: 0.7rem; color: var(--text-tertiary);
+            margin-top: 2px; font-family: 'JetBrains Mono', monospace;
         }
-        .card-emoji { font-size: 1.6rem; }
-        .card-title {
-            font-size: 1.3rem; font-weight: 400;
-            letter-spacing: -0.01em;
+        .chart-footnote {
+            text-align: center; padding: 6px 0 12px; font-size: 0.6rem;
+            color: #556677; font-style: italic;
         }
-        .card-subtitle {
-            padding: 0 2.5rem 1.5rem;
-            font-size: 0.85rem; font-weight: 300;
-            color: var(--text-secondary); line-height: 1.7;
+        .chart-stats {
+            display: grid; grid-template-columns: repeat(3,1fr);
+            gap: 1rem; padding: 1rem 2rem 1.5rem;
         }
-
-        .card-chart {
-            width: 100%; border-top: 1px solid var(--border);
+        .stat-box {
+            text-align: center; padding: 1rem 0.5rem;
+            background: rgba(12,181,245,0.04); border: 1px solid rgba(12,181,245,0.1);
+            border-radius: 8px;
         }
-        .card-chart iframe {
-            width: 100%; border: none; display: block;
-            min-height: 560px;
-        }
-
-        /* ── Product grid ── */
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 1.5rem;
-        }
-        .product-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 1.8rem 2rem;
-            transition: border-color 0.3s ease, transform 0.2s ease;
-        }
-        .product-card:hover {
-            border-color: var(--accent-border);
-            transform: translateY(-2px);
-        }
-        .product-emoji { font-size: 1.4rem; margin-bottom: 0.8rem; }
-        .product-name {
-            font-size: 1rem; font-weight: 500;
-            margin-bottom: 0.5rem; color: var(--text-primary);
-        }
-        .product-desc {
-            font-size: 0.82rem; font-weight: 300;
-            color: var(--text-secondary); line-height: 1.7;
-        }
-        .product-tag {
-            display: inline-block; margin-top: 1rem;
+        .stat-val {
+            font-size: 1.4rem; font-weight: 600; color: var(--blue-primary);
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.6rem; font-weight: 300;
-            letter-spacing: 0.15em; text-transform: uppercase;
-            color: var(--accent); padding: 0.25rem 0.6rem;
-            border: 1px solid var(--accent-border);
-            border-radius: 4px;
+        }
+        .stat-lbl {
+            font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.3rem;
+            letter-spacing: 0.06em; text-transform: uppercase;
         }
 
-        /* ── Footer ── */
+        .coming-soon {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem; margin-top: 2rem; opacity: 0; animation: fadeUp 0.8s ease 0.6s forwards;
+        }
+        .cs-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 1.5rem; transition: border-color 0.3s ease;
+        }
+        .cs-card:hover { border-color: var(--accent-border); }
+        .cs-emoji { font-size: 1.5rem; margin-bottom: 0.75rem; }
+        .cs-title { font-size: 0.95rem; font-weight: 500; margin-bottom: 0.3rem; }
+        .cs-desc { font-size: 0.8rem; color: var(--text-tertiary); line-height: 1.6; }
+
         .footer {
-            padding: 3rem;
-            text-align: center;
-            font-size: 0.7rem;
-            color: var(--text-tertiary);
-            border-top: 1px solid var(--border);
-            margin-top: 4rem;
+            text-align: center; padding: 3rem 2rem; font-size: 0.7rem;
+            color: var(--text-tertiary); border-top: 1px solid var(--border); margin-top: 4rem;
         }
-        .footer a { color: var(--accent); text-decoration: none; }
 
-        /* ── Responsive ── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         @media (max-width: 768px) {
             nav { padding: 1rem 1.5rem; }
-            .nav-links { gap: 1.5rem; }
             .nav-logo-text { display: none; }
-            .page-header { padding: 7rem 1.5rem 2rem; }
-            .research-section { padding: 3rem 1.5rem; }
-            .card-header { padding: 1.5rem 1.5rem 0.8rem; }
-            .card-subtitle { padding: 0 1.5rem 1.2rem; }
-            .product-grid { grid-template-columns: 1fr; }
+            .nav-links { gap: 1.5rem; }
+            .page { padding: 6rem 1rem 3rem; }
+            .chart-stats { grid-template-columns: 1fr; }
+            .coming-soon { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <nav>
-        <a href="index.html" class="nav-logo">
-            <svg class="nav-logo-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="5" y="48" width="28" height="28" rx="2" fill="#0cb5f5" opacity="0.55" transform="rotate(-15 19 62)"/>
-                <rect x="20" y="35" width="28" height="28" rx="2" fill="#0cb5f5" opacity="0.8" transform="rotate(-15 34 49)"/>
-                <path d="M42 20 L70 20 Q90 20 90 42 Q90 64 70 64 L58 64 L58 48 L68 48 Q76 48 76 42 Q76 36 68 36 L42 36 Z" fill="#0cb5f5"/>
-            </svg>
-            <span class="nav-logo-text">Protean</span>
-        </a>
-        <ul class="nav-links">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="index.html#about">About</a></li>
-            <li><a href="index.html#strategy">Strategy</a></li>
-            <li><a href="research.html" class="active">Research</a></li>
-            <li><a href="index.html#contact">Contact</a></li>
-        </ul>
-    </nav>
+<nav>
+    <a href="index.html" class="nav-logo">
+        <svg class="nav-logo-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="100" rx="16" fill="#0a1744"/>
+            <path d="M30 72V28h20c12 0 18 6 18 16s-6 16-18 16H42v12H30z" fill="#0cb5f5"/>
+            <circle cx="80" cy="20" r="4" fill="#0cb5f5" opacity="0.6"/>
+        </svg>
+        <span class="nav-logo-text">Protean</span>
+    </a>
+    <ul class="nav-links">
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="index.html#strategy">Strategy</a></li>
+        <li><a href="research.html" class="active">Research</a></li>
+        <li><a href="index.html#terms">Terms</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+    </ul>
+</nav>
 
+<div class="page">
     <div class="page-header">
-        <div class="eyebrow">Proprietary Research</div>
-        <h1><strong>Research &amp; Models</strong></h1>
-        <p>
-            Protean's research framework combines proprietary quantitative models, 
-            derivative flow analysis, and macro regime classification to generate 
-            actionable intelligence with measurable predictive power.
+        <div class="page-eyebrow">Proprietary Research</div>
+        <h1 class="page-title"><strong>Protean Research Lab</strong></h1>
+        <p class="page-desc">
+            Quantitative frameworks and proprietary models powering Protean's investment process.
+            Interactive visualizations updated as new data becomes available.
         </p>
     </div>
 
-    <div class="divider"></div>
-
-    <!-- ── Featured: CPDP Model ── -->
-    <div class="research-section">
-        <div class="section-title">Featured Model</div>
-
-        <div class="research-card">
-            <div class="card-header">
-                <span class="card-emoji">📡</span>
-                <span class="card-title">CPDP Model — 16-Month PCE Leading Indicator</span>
+    <div class="research-card">
+        <div class="card-header">
+            <div class="card-tag">Macro — Leading Indicator</div>
+            <div class="card-title">CPDP Model vs PCE — 16-Month Leading Indicator</div>
+            <div class="card-subtitle">Lazar CPDP Model (16mo lag) vs PCE CY/OY Index | Proprietary Framework | Monthly Data</div>
+        </div>
+        <div class="card-body">
+            <div class="chart-embed">
+                <canvas id="cpdp-canvas"></canvas>
+                <div class="chart-legend">
+                    <div class="legend-item"><div class="legend-line" style="background:#e1ebf8;"></div>PCE CY/OY Index (LHS)</div>
+                    <div class="legend-item"><div class="legend-line" style="background:#0cb5f5;"></div>Lazar CPDP Model 16mo Lag (RHS)</div>
+                    <div class="legend-item"><div class="legend-line" style="background:#ff4466;border:none;height:0;border-top:2px dashed #ff4466;width:20px;"></div>CPDP Forward Projection</div>
+                    <div class="legend-item"><div class="legend-line" style="background:#ffaa33;border:none;height:0;border-top:2px dashed #ffaa33;width:20px;"></div>Model PCE Estimate</div>
+                </div>
+                <div class="chart-scrubber" id="scrubber">
+                    <input type="range" id="slider" min="1" max="140" value="140">
+                    <div class="date-label" id="date-label"></div>
+                </div>
+                <div class="chart-footnote">As of March 13, 2026 | Correlation = 74.1% | R² = 54.9% | Proprietary CPDP Framework © Protean Asset Management</div>
             </div>
-            <div class="card-subtitle">
-                The Lazar CPDP (Consumer Price Dynamics Predictor) model identifies structural inflection 
-                points in personal consumption expenditure inflation with a 16-month forward lead. 
-                74.1% correlation to realized PCE with R² of 54.9% — currently projecting PCE 
-                re-acceleration toward 3.40% by mid-2027.
-            </div>
-            <div class="card-chart">
-                <iframe src="cpdp.html" loading="lazy"></iframe>
+            <div class="chart-stats">
+                <div class="stat-box"><div class="stat-val">74.1%</div><div class="stat-lbl">Correlation</div></div>
+                <div class="stat-box"><div class="stat-val">54.9%</div><div class="stat-lbl">R-Squared</div></div>
+                <div class="stat-box"><div class="stat-val">3.3954%</div><div class="stat-lbl">PCE Model Fwd (Apr '27)</div></div>
             </div>
         </div>
     </div>
 
-    <div class="divider"></div>
+    <div class="page-eyebrow" style="margin-top:2rem;">Research Suite</div>
+    <h2 style="font-size:1.3rem; font-weight:400; margin-bottom:0.5rem;">More models coming soon</h2>
+    <p class="page-desc" style="margin-bottom:0;">Interactive visualizations for the full Protean research stack.</p>
 
-    <!-- ── Research Suite ── -->
-    <div class="research-section">
-        <div class="section-title">Protean Research Suite</div>
-
-        <div class="product-grid">
-            <div class="product-card">
-                <div class="product-emoji">☀️</div>
-                <div class="product-name">Daily Flash</div>
-                <div class="product-desc">
-                    Pre-market macro pulse — 5 key themes with positioning implications. 
-                    Delivered daily at 8:45 AM EST before the opening bell.
-                </div>
-                <span class="product-tag">Daily</span>
-            </div>
-
-            <div class="product-card">
-                <div class="product-emoji">🎯</div>
-                <div class="product-name">Dealer Gamma</div>
-                <div class="product-desc">
-                    Unified SPY + SPX dealer gamma mapping — retail vs institutional flow synthesis. 
-                    Single-name reports with strike-level unusual activity breakdowns.
-                </div>
-                <span class="product-tag">On-Demand</span>
-            </div>
-
-            <div class="product-card">
-                <div class="product-emoji">🧠</div>
-                <div class="product-name">Smart Money Monitor</div>
-                <div class="product-desc">
-                    Quarterly 13F institutional activity tracker — new positions, exits, 
-                    and concentration shifts from top allocators and activist investors.
-                </div>
-                <span class="product-tag">Quarterly</span>
-            </div>
-
-            <div class="product-card">
-                <div class="product-emoji">📡</div>
-                <div class="product-name">Divergence Monitor</div>
-                <div class="product-desc">
-                    Sentiment vs. fundamentals dislocation screener — identifies names where 
-                    positioning diverges from underlying value, creating asymmetric opportunities.
-                </div>
-                <span class="product-tag">Weekly</span>
-            </div>
-
-            <div class="product-card">
-                <div class="product-emoji">🪤</div>
-                <div class="product-name">Value Trap Monitor</div>
-                <div class="product-desc">
-                    Dividend and yield trap screener — flags high-yield names at risk of 
-                    distribution cuts with safer alternative positioning.
-                </div>
-                <span class="product-tag">Weekly</span>
-            </div>
-
-            <div class="product-card">
-                <div class="product-emoji">📊</div>
-                <div class="product-name">Options Flow Analyzer</div>
-                <div class="product-desc">
-                    Unusual options activity detection with optimal structure recommendations — 
-                    every trade broken out by strike and expiry.
-                </div>
-                <span class="product-tag">On-Demand</span>
-            </div>
-
-            <div class="product-card">
-                <div class="product-emoji">🔄</div>
-                <div class="product-name">Regime Monitor</div>
-                <div class="product-desc">
-                    Macro regime classification with historical analogue matching — 
-                    identifies which sectors and assets outperform in the current environment.
-                </div>
-                <span class="product-tag">Weekly</span>
-            </div>
-
-            <div class="product-card">
-                <div class="product-emoji">🏛️</div>
-                <div class="product-name">Policy &amp; Politics Monitor</div>
-                <div class="product-desc">
-                    Top 5 domestic + top 5 geopolitical developments with direct market 
-                    impact assessment and positioning implications.
-                </div>
-                <span class="product-tag">Weekly</span>
-            </div>
+    <div class="coming-soon">
+        <div class="cs-card">
+            <div class="cs-emoji">🎯</div>
+            <div class="cs-title">Dealer Gamma Maps</div>
+            <div class="cs-desc">Unified SPY + SPX gamma exposure with single-name overlays. Real-time strike-level positioning.</div>
+        </div>
+        <div class="cs-card">
+            <div class="cs-emoji">🔄</div>
+            <div class="cs-title">Regime Monitor</div>
+            <div class="cs-desc">Macro regime classification with historical analogues. Sector rotation signals and expected timeframes.</div>
+        </div>
+        <div class="cs-card">
+            <div class="cs-emoji">📡</div>
+            <div class="cs-title">Divergence Monitor</div>
+            <div class="cs-desc">Sentiment vs fundamentals dislocation screener. Identifies crowded positioning against reality.</div>
+        </div>
+        <div class="cs-card">
+            <div class="cs-emoji">🧠</div>
+            <div class="cs-title">Smart Money Monitor</div>
+            <div class="cs-desc">13F quarterly activity tracker. New positions, liquidations, and conviction shifts from top funds.</div>
+        </div>
+        <div class="cs-card">
+            <div class="cs-emoji">📊</div>
+            <div class="cs-title">Options Flow Analyzer</div>
+            <div class="cs-desc">Unusual activity detection with optimal structure recommendations by strike and expiry.</div>
+        </div>
+        <div class="cs-card">
+            <div class="cs-emoji">🏛️</div>
+            <div class="cs-title">Policy & Politics Monitor</div>
+            <div class="cs-desc">Top domestic and geopolitical catalysts with market transmission channels and probability scoring.</div>
         </div>
     </div>
+</div>
 
-    <div class="footer">
-        © 2026 Protean Asset Management LLC. All rights reserved.<br>
-        <a href="index.html">← Back to Home</a>
-    </div>
+<div class="footer">
+    © 2026 Protean Asset Management LLC. All rights reserved. Proprietary research — not investment advice.
+</div>
 
-</body>
-</html>
+<script>
+(function(){
+const DATA = [
+["09/30/2015",1.2321,0.189832,null],
+["10/31/2015",1.178,0.387411,null],
+["11/30/2015",1.1967,0.314429,null],
+["12/31/2015",1.1917,0.521301,null],
+["01/31/2016",1.4062,0.285588,null],
+["02/29/2016",1.4659,0.529171,null],
+["03/31/2016",1.4574,0.100885,null],
+["04/30/2016",1.5199,0.760064,null],
+["05/31/2016",1.5687,0.563923,null],
+["06/30/2016",1.5524,0.701812,null],
+["07/31/2016",1.5993,0.747892,null],
+["08/31/2016",1.697,0.720316,null],
+["09/30/2016",1.6853,0.524127,null],
+["10/31/2016",1.7824,0.139688,null],
+["11/30/2016",1.7189,0.629403,null],
+["12/31/2016",1.7701,0.399298,null],
+["01/31/2017",1.8633,0.652808,null],
+["02/28/2017",1.8673,0.836947,null],
+["03/31/2017",1.6786,0.402702,null],
+["04/30/2017",1.6368,0.427341,null],
+["05/31/2017",1.5455,0.271952,null],
+["06/30/2017",1.5764,0.258267,null],
+["07/31/2017",1.5031,0.422966,null],
+["08/31/2017",1.4336,0.783908,null],
+["09/30/2017",1.4226,0.340087,null],
+["10/31/2017",1.541,0.758044,null],
+["11/30/2017",1.5454,0.90803,null],
+["12/31/2017",1.5769,1.151179,null],
+["01/31/2018",1.632,0.782691,null],
+["02/28/2018",1.6442,1.013898,null],
+["03/31/2018",1.9092,0.781833,null],
+["04/30/2018",1.8842,0.880729,null],
+["05/31/2018",1.9809,1.372834,null],
+["06/30/2018",1.9362,1.271134,null],
+["07/31/2018",1.9958,1.285757,null],
+["08/31/2018",1.8958,1.123295,null],
+["09/30/2018",1.9603,0.945552,null],
+["10/31/2018",1.8709,1.139166,null],
+["11/30/2018",2.0102,1.12272,null],
+["12/31/2018",2.0381,1.446886,null],
+["01/31/2019",1.8444,1.703458,null],
+["02/28/2019",1.7441,2.015681,null],
+["03/31/2019",1.6161,1.911157,null],
+["04/30/2019",1.6368,1.741923,null],
+["05/31/2019",1.5632,1.832983,null],
+["06/30/2019",1.657,1.171032,null],
+["07/31/2019",1.6391,1.498975,null],
+["08/31/2019",1.7458,1.578526,null],
+["09/30/2019",1.632,1.439602,null],
+["10/31/2019",1.6236,1.571856,null],
+["11/30/2019",1.4977,1.527107,null],
+["12/31/2019",1.5448,1.665052,null],
+["01/31/2020",1.5913,1.558652,null],
+["02/29/2020",1.6977,1.6299,null],
+["03/31/2020",1.5273,1.514021,null],
+["04/30/2020",0.9955,1.586517,null],
+["05/31/2020",0.9974,1.64722,null],
+["06/30/2020",0.9705,1.281157,null],
+["07/31/2020",1.2143,1.341226,null],
+["08/31/2020",1.3931,1.084172,null],
+["09/30/2020",1.4797,0.406765,null],
+["10/31/2020",1.4217,0.517403,null],
+["11/30/2020",1.4535,0.592034,null],
+["12/31/2020",1.5088,0.727097,null],
+["01/31/2021",1.6975,1.126772,null],
+["02/28/2021",1.7095,1.130678,null],
+["03/31/2021",2.1991,1.194484,null],
+["04/30/2021",3.1306,1.081407,null],
+["05/31/2021",3.5411,1.207513,null],
+["06/30/2021",3.8617,2.397815,null],
+["07/31/2021",3.9271,3.83387,null],
+["08/31/2021",3.9585,4.030846,null],
+["09/30/2021",4.0138,3.349762,null],
+["10/31/2021",4.4367,3.291562,null],
+["11/30/2021",4.8909,4.1926,null],
+["12/31/2021",5.2146,2.759577,null],
+["01/31/2022",5.3584,1.840111,null],
+["02/28/2022",5.6028,1.199737,null],
+["03/31/2022",5.5932,1.94698,null],
+["04/30/2022",5.345,2.774251,null],
+["05/31/2022",5.1841,2.571228,null],
+["06/30/2022",5.3157,2.971145,null],
+["07/31/2022",5.1074,3.510117,null],
+["08/31/2022",5.3624,4.084917,null],
+["09/30/2022",5.6065,4.332153,null],
+["10/31/2022",5.4598,4.076492,null],
+["11/30/2022",5.2081,4.27379,null],
+["12/31/2022",4.9669,4.632285,null],
+["01/31/2023",4.9377,4.735338,null],
+["02/28/2023",4.8556,5.439614,null],
+["03/31/2023",4.7833,5.686147,null],
+["04/30/2023",4.7896,5.717834,null],
+["05/31/2023",4.7316,4.939802,null],
+["06/30/2023",4.3838,3.926096,null],
+["07/31/2023",4.2991,3.949428,null],
+["08/31/2023",3.8282,4.620202,null],
+["09/30/2023",3.6878,3.870621,null],
+["10/31/2023",3.4741,3.539581,null],
+["11/30/2023",3.2907,3.029862,null],
+["12/31/2023",3.1124,2.703714,null],
+["01/31/2024",3.159,2.224252,null],
+["02/29/2024",3.0595,2.229309,null],
+["03/31/2024",3.1222,2.338603,null],
+["04/30/2024",3.0067,2.282701,null],
+["05/31/2024",2.7712,2.148438,null],
+["06/30/2024",2.7532,0.858571,null],
+["07/31/2024",2.8062,-0.230593,null],
+["08/31/2024",2.8733,-0.203266,null],
+["09/30/2024",2.8386,-0.678479,null],
+["10/31/2024",2.9865,-0.143678,null],
+["11/30/2024",2.9807,0.103083,null],
+["12/31/2024",2.9886,-0.105096,null],
+["01/31/2025",2.7801,0.313011,null],
+["02/28/2025",2.9686,0.666679,null],
+["03/31/2025",2.6703,1.153134,null],
+["04/30/2025",2.6148,0.859298,null],
+["05/31/2025",2.7839,0.7335,null],
+["06/30/2025",2.8074,0.911328,null],
+["07/31/2025",2.863,0.768509,null],
+["08/31/2025",2.9124,0.002956,null],
+["09/30/2025",2.8251,0.411611,null],
+["10/31/2025",2.7562,0.726996,null],
+["11/30/2025",2.8323,0.991555,null],
+["12/31/2025",3.0057,1.159984,null],
+["01/31/2026",3.0557,1.105468,null],
+["03/02/2026",null,0.826886,2.8493],
+["04/02/2026",null,0.780872,2.8152],
+["05/03/2026",null,0.883225,2.8911],
+["05/30/2026",null,0.978509,2.9616],
+["06/30/2026",null,0.759336,2.7993],
+["07/31/2026",null,0.69353,2.7505],
+["08/30/2026",null,1.221059,3.1413],
+["09/29/2026",null,1.028012,2.9983],
+["10/29/2026",null,0.968255,2.9541],
+["11/28/2026",null,0.920447,2.9186],
+["12/28/2026",null,1.000108,2.9776],
+["01/27/2027",null,0.975988,2.9598],
+["02/26/2027",null,0.792238,2.8237],
+["03/28/2027",null,1.546313,3.3823],
+["04/27/2027",null,1.564037,3.3954]
+];
+// [date, PCE%, CPDP, ModelPCE%]
+
+const PROJ_START = 125;
+const canvas = document.getElementById('cpdp-canvas');
+const ctx = canvas.getContext('2d');
+const scrubberEl = document.getElementById('scrubber');
+const slider = document.getElementById('slider');
+const dateLabel = document.getElementById('date-label');
+
+const PC='#0cb5f5', WHITE='#e1ebf8', PROJ='#ff4466', MODEL='#ffaa33', BG='#0B1121';
+let dpr = window.devicePixelRatio||1;
+let loops=0, animFrame=0, isAnimating=true, scrubberVisible=false, lastN=DATA.length;
+
+function resize(){
+    const w=canvas.parentElement.clientWidth; const h=Math.round(w*0.5);
+    canvas.width=w*dpr; canvas.height=h*dpr;
+    canvas.style.height=h+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+resize(); window.addEventListener('resize',()=>{ resize(); drawChart(lastN); });
+
+function drawChart(n){
+    lastN=n;
+    const w=canvas.width/dpr, h=canvas.height/dpr;
+    const pad={t:45,r:65,b:45,l:60};
+    const cw=w-pad.l-pad.r, ch=h-pad.t-pad.b;
+
+    ctx.fillStyle=BG; ctx.fillRect(0,0,w,h);
+    const d=DATA.slice(0,n);
+
+    // Compute ranges from ALL data for stable axes
+    const allPce=DATA.filter(r=>r[1]!==null).map(r=>r[1]);
+    const allCpdp=DATA.map(r=>r[2]);
+    const allModel=DATA.filter(r=>r[3]!==null).map(r=>r[3]);
+    const pceMin=0, pceMax=Math.ceil(Math.max(...allPce,...allModel)+0.5);
+    const cpdpMin=Math.floor(Math.min(...allCpdp)-0.5);
+    const cpdpMax=Math.ceil(Math.max(...allCpdp)+0.5);
+
+    // Title
+    ctx.font='bold 13px sans-serif'; ctx.fillStyle=WHITE;
+    ctx.fillText('CPDP MODEL vs PCE',pad.l,24);
+    const tw=ctx.measureText('CPDP MODEL vs PCE').width;
+    ctx.font='13px sans-serif'; ctx.fillStyle='#8899bb';
+    ctx.fillText('— 16-Month Leading Indicator',pad.l+tw+8,24);
+
+    // Grid
+    ctx.strokeStyle='#1a2744'; ctx.lineWidth=0.5;
+    const yticks=6;
+    for(let i=0;i<=yticks;i++){
+        const y=pad.t+ch*(1-i/yticks);
+        ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+cw,y); ctx.stroke();
+        const pv=pceMin+(pceMax-pceMin)*i/yticks;
+        ctx.fillStyle='#aabbcc'; ctx.font='10px sans-serif'; ctx.textAlign='right';
+        ctx.fillText(pv.toFixed(1)+'%',pad.l-8,y+4);
+        const cv=cpdpMin+(cpdpMax-cpdpMin)*i/yticks;
+        ctx.textAlign='left'; ctx.fillStyle=PC;
+        ctx.fillText(cv.toFixed(1),w-pad.r+8,y+4);
+    }
+    ctx.textAlign='left';
+
+    // Zero line
+    const zy=pad.t+ch*(1-(0-pceMin)/(pceMax-pceMin));
+    if(zy>pad.t&&zy<pad.t+ch){
+        ctx.strokeStyle='#2a3a5c'; ctx.lineWidth=0.8;
+        ctx.beginPath(); ctx.moveTo(pad.l,zy); ctx.lineTo(pad.l+cw,zy); ctx.stroke();
+    }
+
+    function xPos(i){ return pad.l+(i/(n-1||1))*cw; }
+    function yPce(v){ return pad.t+ch*(1-(v-pceMin)/(pceMax-pceMin)); }
+    function yCpdp(v){ return pad.t+ch*(1-(v-cpdpMin)/(cpdpMax-cpdpMin)); }
+
+    // Projection zone shading
+    const psi=Math.min(PROJ_START,n);
+    if(n>PROJ_START){
+        const px=xPos(PROJ_START);
+        ctx.fillStyle='rgba(255,68,102,0.03)';
+        ctx.fillRect(px,pad.t,pad.l+cw-px,ch);
+        ctx.strokeStyle='rgba(255,68,102,0.2)'; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+        ctx.beginPath(); ctx.moveTo(px,pad.t); ctx.lineTo(px,pad.t+ch); ctx.stroke();
+        ctx.setLineDash([]); ctx.fillStyle='rgba(255,68,102,0.5)'; ctx.font='9px sans-serif';
+        ctx.fillText('PROJECTION',px+6,pad.t+14);
+    }
+
+    // PCE line
+    ctx.strokeStyle=WHITE; ctx.lineWidth=2; ctx.beginPath();
+    let started=false;
+    for(let i=0;i<n;i++){
+        if(d[i][1]===null) continue;
+        const x=xPos(i),y=yPce(d[i][1]);
+        if(!started){ ctx.moveTo(x,y); started=true; } else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+
+    // CPDP historical
+    ctx.strokeStyle=PC; ctx.lineWidth=2; ctx.beginPath();
+    for(let i=0;i<Math.min(n,PROJ_START+1);i++){
+        if(d[i][2]===null) continue;
+        const x=xPos(i),y=yCpdp(d[i][2]);
+        i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+
+    // CPDP projection
+    if(n>PROJ_START){
+        ctx.strokeStyle=PROJ; ctx.lineWidth=2; ctx.setLineDash([6,4]);
+        ctx.beginPath(); ctx.moveTo(xPos(PROJ_START),yCpdp(d[PROJ_START][2]));
+        for(let i=PROJ_START+1;i<n;i++) ctx.lineTo(xPos(i),yCpdp(d[i][2]));
+        ctx.stroke(); ctx.setLineDash([]);
+    }
+
+    // Model PCE line (dashed orange)
+    ctx.strokeStyle=MODEL; ctx.lineWidth=1.5; ctx.setLineDash([4,3]);
+    ctx.beginPath(); started=false;
+    for(let i=0;i<n;i++){
+        if(d[i][3]===null) continue;
+        const x=xPos(i),y=yPce(d[i][3]);
+        if(!started){ ctx.moveTo(x,y); started=true; } else ctx.lineTo(x,y);
+    }
+    ctx.stroke(); ctx.setLineDash([]);
+
+    // End dots
+    const li=n-1;
+    if(d[li][1]!==null){
+        ctx.fillStyle=WHITE; ctx.beginPath(); ctx.arc(xPos(li),yPce(d[li][1]),4,0,Math.PI*2); ctx.fill();
+        ctx.font='bold 10px sans-serif'; ctx.fillStyle=WHITE;
+        ctx.fillText(d[li][1].toFixed(2)+'%',xPos(li)+8,yPce(d[li][1])-6);
+    }
+    if(d[li][2]!==null){
+        ctx.fillStyle=n>PROJ_START?PROJ:PC; ctx.beginPath(); ctx.arc(xPos(li),yCpdp(d[li][2]),4,0,Math.PI*2); ctx.fill();
+        ctx.font='bold 10px sans-serif'; ctx.fillStyle=n>PROJ_START?PROJ:PC;
+        ctx.fillText(d[li][2].toFixed(2),xPos(li)+8,yCpdp(d[li][2])-6);
+    }
+    if(d[li][3]!==null){
+        ctx.fillStyle=MODEL; ctx.beginPath(); ctx.arc(xPos(li),yPce(d[li][3]),4,0,Math.PI*2); ctx.fill();
+        ctx.font='bold 10px sans-serif'; ctx.fillStyle=MODEL;
+        ctx.fillText(d[li][3].toFixed(2)+'%',xPos(li)+8,yPce(d[li][3])+14);
+    }
+
+    // X-axis dates
+    ctx.fillStyle='#667799'; ctx.font='9px sans-serif'; ctx.textAlign='center';
+    const step=Math.max(1,Math.floor(n/10));
+    for(let i=0;i<n;i+=step){
+        const parts=d[i][0].split('/');
+        const months=['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        ctx.fillText(months[+parts[0]]+" '"+parts[2].slice(-2),xPos(i),pad.t+ch+22);
+    }
+    ctx.textAlign='left';
+
+    // Axis labels
+    ctx.save(); ctx.translate(14,pad.t+ch/2); ctx.rotate(-Math.PI/2);
+    ctx.fillStyle='#aabbcc'; ctx.font='9px sans-serif'; ctx.textAlign='center';
+    ctx.fillText('PCE CY/OY (%)',0,0); ctx.restore();
+    ctx.save(); ctx.translate(w-8,pad.t+ch/2); ctx.rotate(Math.PI/2);
+    ctx.fillStyle=PC; ctx.font='9px sans-serif'; ctx.textAlign='center';
+    ctx.fillText('CPDP Index',0,0); ctx.restore();
+}
+
+// Hover
+canvas.addEventListener('mousemove',function(e){
+    if(isAnimating) return;
+    const rect=canvas.getBoundingClientRect();
+    const mx=e.clientX-rect.left, w=rect.width;
+    const pad_l=60,pad_r=65,cw=w-pad_l-pad_r;
+    const idx=Math.round(((mx-pad_l)/cw)*(lastN-1));
+    if(idx>=0&&idx<lastN){
+        drawChart(lastN);
+        const d=DATA[idx], x=pad_l+(idx/(lastN-1||1))*cw;
+        const h=canvas.height/dpr;
+        ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(x,45); ctx.lineTo(x,h-45); ctx.stroke();
+        ctx.fillStyle='rgba(11,17,33,0.92)';
+        const bw=170, bh=d[3]!==null?62:48;
+        const bx=Math.min(x+10,canvas.width/dpr-bw-10);
+        ctx.fillRect(bx,50,bw,bh);
+        ctx.strokeStyle='rgba(12,181,245,0.3)'; ctx.strokeRect(bx,50,bw,bh);
+        ctx.font='10px sans-serif'; ctx.fillStyle='#e1ebf8';
+        ctx.fillText(d[0],bx+8,66);
+        ctx.fillStyle='#aabbcc';
+        ctx.fillText('PCE: '+(d[1]!==null?d[1].toFixed(2)+'%':'—'),bx+8,80);
+        ctx.fillStyle=PC;
+        ctx.fillText('CPDP: '+(d[2]!==null?d[2].toFixed(4):'—'),bx+8,92);
+        if(d[3]!==null){ ctx.fillStyle=MODEL; ctx.fillText('Model PCE: '+d[3].toFixed(2)+'%',bx+8,104); }
+    }
+});
+
+slider.addEventListener('input',function(){
+    isAnimating=false;
+    drawChart(+this.value);
+    dateLabel.textContent=DATA[+this.value-1][0];
+});
+
+function animate(){
+    if(!isAnimating) return;
+    animFrame+=2;
+    const n=Math.min(animFrame,DATA.length);
+    drawChart(n);
+    if(n>=DATA.length){
+        loops++;
+        if(loops>=3&&!scrubberVisible){ scrubberEl.style.display='block'; scrubberVisible=true; }
+        if(loops<8){ setTimeout(()=>{ animFrame=0; requestAnimationFrame(animate); },2500); }
+        return;
+    }
+    setTimeout(()=>requestAnimationFrame(animate),60);
+}
+animate();
+})();
+</script>
+</body></html>
