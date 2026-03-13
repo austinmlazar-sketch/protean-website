@@ -32,8 +32,7 @@ canvas { width:100%; display:block; cursor:crosshair; }
   <div class="legend-item"><div class="legend-line" style="background:#e1ebf8;"></div>PCE CY/OY Index (LHS)</div>
   <div class="legend-item"><div class="legend-line" style="background:#0cb5f5;"></div>Lazar CPDP Model 16mo Lag (RHS)</div>
   <div class="legend-item"><div class="legend-line" style="background:#ff4466;border:none;height:0;border-top:2px dashed #ff4466;width:20px;"></div>CPDP Forward Projection</div>
-  <div class="legend-item"><div class="legend-line" style="background:#ffaa33;border:none;height:0;border-top:2px dashed #ffaa33;width:20px;"></div>Model PCE Estimate</div>
-</div>
+  </div>
 <div class="scrubber" id="scrubber">
   <input type="range" id="slider" min="1" max="140" value="140">
   <div class="date-label" id="date-label"></div>
@@ -285,7 +284,7 @@ function drawChart(n){
 
     // CPDP historical
     ctx.strokeStyle=PC; ctx.lineWidth=2; ctx.beginPath();
-    for(let i=0;i<Math.min(n,PROJ_START+1);i++){
+    for(let i=0;i<n;i++){
         if(d[i][2]===null) continue;
         const x=xPos(i),y=yCpdp(d[i][2]);
         i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
@@ -300,15 +299,6 @@ function drawChart(n){
         ctx.stroke(); ctx.setLineDash([]);
     }
 
-    // Model PCE line (dashed orange)
-    ctx.strokeStyle=MODEL; ctx.lineWidth=1.5; ctx.setLineDash([4,3]);
-    ctx.beginPath(); started=false;
-    for(let i=0;i<n;i++){
-        if(d[i][3]===null) continue;
-        const x=xPos(i),y=yPce(d[i][3]);
-        if(!started){ ctx.moveTo(x,y); started=true; } else ctx.lineTo(x,y);
-    }
-    ctx.stroke(); ctx.setLineDash([]);
 
     // End dots
     const li=n-1;
@@ -321,11 +311,6 @@ function drawChart(n){
         ctx.fillStyle=n>PROJ_START?PROJ:PC; ctx.beginPath(); ctx.arc(xPos(li),yCpdp(d[li][2]),4,0,Math.PI*2); ctx.fill();
         ctx.font='bold 10px sans-serif'; ctx.fillStyle=n>PROJ_START?PROJ:PC;
         ctx.fillText(d[li][2].toFixed(2),xPos(li)+8,yCpdp(d[li][2])-6);
-    }
-    if(d[li][3]!==null){
-        ctx.fillStyle=MODEL; ctx.beginPath(); ctx.arc(xPos(li),yPce(d[li][3]),4,0,Math.PI*2); ctx.fill();
-        ctx.font='bold 10px sans-serif'; ctx.fillStyle=MODEL;
-        ctx.fillText(d[li][3].toFixed(2)+'%',xPos(li)+8,yPce(d[li][3])+14);
     }
 
     // X-axis dates
@@ -371,7 +356,7 @@ canvas.addEventListener('mousemove',function(e){
         ctx.fillText('PCE: '+(d[1]!==null?d[1].toFixed(2)+'%':'—'),bx+8,80);
         ctx.fillStyle=PC;
         ctx.fillText('CPDP: '+(d[2]!==null?d[2].toFixed(4):'—'),bx+8,92);
-        if(d[3]!==null){ ctx.fillStyle=MODEL; ctx.fillText('Model PCE: '+d[3].toFixed(2)+'%',bx+8,104); }
+        
     }
 });
 
