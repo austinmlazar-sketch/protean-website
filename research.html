@@ -446,16 +446,15 @@ function drawChart(n){
     }
     ctx.stroke();
 
-    // CPDP Forward Projection overlay (red dashed on projection zone)
-    if(n>PROJ_START){
-        ctx.strokeStyle=PROJ; ctx.lineWidth=2; ctx.setLineDash([6,4]);
-        ctx.beginPath(); ctx.moveTo(xPos(PROJ_START),yCpdp(d[PROJ_START][2]));
-        for(let i=PROJ_START+1;i<n;i++){
-            if(d[i][2]===null) continue;
-            ctx.lineTo(xPos(i),yCpdp(d[i][2]));
-        }
-        ctx.stroke(); ctx.setLineDash([]);
+    // PCE Model Projection (red dashed, LHS axis — shows where PCE is heading)
+    ctx.strokeStyle=PROJ; ctx.lineWidth=2; ctx.setLineDash([6,4]);
+    ctx.beginPath(); let projStarted=false;
+    for(let i=0;i<n;i++){
+        if(d[i][3]===null) continue;
+        const x=xPos(i), y=yPce(d[i][3]);
+        if(!projStarted){ ctx.moveTo(x,y); projStarted=true; } else ctx.lineTo(x,y);
     }
+    ctx.stroke(); ctx.setLineDash([]);
 
     // 3.40% label at projection end
     if(n>=DATA.length){
@@ -464,7 +463,6 @@ function drawChart(n){
             const lx=xPos(DATA.length-1), ly=yPce(lastPt[3]);
             ctx.fillStyle=PROJ; ctx.font='bold 10px sans-serif';
             ctx.fillText('3.40%',lx-40,ly-8);
-            // small dot
             ctx.beginPath(); ctx.arc(lx,ly,3,0,Math.PI*2); ctx.fill();
         }
     }
