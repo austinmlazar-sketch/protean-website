@@ -251,6 +251,47 @@
             .hero { padding-top: 6rem; min-height: 70vh; }
             .footer-content { flex-direction: column; gap: 1.5rem; }
         }
+
+        /* ═══ TERMS CARD ═══ */
+        .terms-grid {
+            display: grid;
+            gap: 0;
+            border: 1px solid rgba(12,181,245,0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(11,17,33,0.6);
+        }
+        .terms-row {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            border-bottom: 1px solid rgba(12,181,245,0.08);
+        }
+        .terms-row:last-child { border-bottom: none; }
+        .terms-row-label {
+            padding: 1rem 1.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            background: rgba(12,181,245,0.04);
+            display: flex;
+            align-items: center;
+        }
+        .terms-row-value {
+            padding: 1rem 1.25rem;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+        }
+        .terms-row-value .sub {
+            display: block;
+            margin-top: 0.35rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>
@@ -545,6 +586,53 @@
                 is SHA-256 checksummed for provenance verification. The backtest is independently 
                 verifiable through 6,600+ trade records with no-lookahead confirmation.
             </p>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+
+    <!-- ═══ STRATEGY TERMS ═══ -->
+    <section id="terms" class="section-grid fade-in">
+        <div class="section-label">Terms</div>
+        <div class="section-content">
+            <h2>Strategy Terms</h2>
+            <div class="terms-grid">
+                <div class="terms-row">
+                    <div class="terms-row-label">Strategy</div>
+                    <div class="terms-row-value">ProteanAI</div>
+                </div>
+                <div class="terms-row">
+                    <div class="terms-row-label">Benchmark</div>
+                    <div class="terms-row-value">S&amp;P 500 (SPX)</div>
+                </div>
+                <div class="terms-row">
+                    <div class="terms-row-label">Manager</div>
+                    <div class="terms-row-value">
+                        Autonomous Systematic Engine
+                        <span class="sub">~16,000 lines of proprietary Python across signal generation, conviction scoring, portfolio construction, and execution infrastructure. Zero human decision points.</span>
+                    </div>
+                </div>
+                <div class="terms-row">
+                    <div class="terms-row-label">Management Fee</div>
+                    <div class="terms-row-value">2% of AUM</div>
+                </div>
+                <div class="terms-row">
+                    <div class="terms-row-label">Performance Fee</div>
+                    <div class="terms-row-value">
+                        20% of profits
+                        <span class="sub">Subject to high watermark. Performance fees are only charged on new profits &mdash; if the fund declines, prior losses must be fully recovered before performance fees resume.</span>
+                    </div>
+                </div>
+                <div class="terms-row">
+                    <div class="terms-row-label">Target Sharpe</div>
+                    <div class="terms-row-value">&gt; 1.0</div>
+                </div>
+                <div class="terms-row">
+                    <div class="terms-row-label">Target Sortino</div>
+                    <div class="terms-row-value">&gt; 1.5</div>
+                </div>
+            </div>
         </div>
     </section>
 
