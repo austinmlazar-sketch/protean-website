@@ -55,6 +55,8 @@
             border-bottom: 1px solid var(--border);
         }
         .nav-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+        .nav-logo-icon { height: 28px; width: auto; }
+
         .nav-logo-text {
             font-size: 0.8rem; font-weight: 500;
             letter-spacing: 0.2em; text-transform: uppercase;
@@ -255,7 +257,13 @@
 
     <nav>
         <a href="/" class="nav-logo">
-            <span class="nav-logo-text">Protean Asset Management</span>
+            <!-- P icon mark - inline SVG approximation of the logo -->
+            <svg class="nav-logo-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="5" y="48" width="28" height="28" rx="2" fill="#0cb5f5" opacity="0.55" transform="rotate(-15 19 62)"/>
+                <rect x="20" y="35" width="28" height="28" rx="2" fill="#0cb5f5" opacity="0.8" transform="rotate(-15 34 49)"/>
+                <path d="M42 20 L70 20 Q90 20 90 42 Q90 64 70 64 L58 64 L58 48 L68 48 Q76 48 76 42 Q76 36 68 36 L42 36 Z" fill="#0cb5f5"/>
+            </svg>
+            <span class="nav-logo-text">Protean</span>
         </a>
         <ul class="nav-links">
             <li><a href="/#about">About</a></li>
