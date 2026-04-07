@@ -292,6 +292,20 @@
             color: var(--text-secondary);
             line-height: 1.5;
         }
+
+        .contact-email {
+            display: inline-flex; align-items: center; gap: 0.75rem;
+            padding: 0.85rem 1.5rem; border: 1px solid var(--accent-border);
+            border-radius: 6px; background: var(--accent-dim);
+            color: var(--accent); text-decoration: none;
+            font-size: 0.85rem; font-weight: 400; letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+        }
+        .contact-email:hover {
+            background: rgba(12, 181, 245, 0.15);
+            border-color: rgba(12, 181, 245, 0.35);
+            box-shadow: 0 0 30px rgba(12, 181, 245, 0.08);
+        }
     </style>
 </head>
 <body>
@@ -644,14 +658,16 @@
         <div class="section-content">
             <h2>Learn More</h2>
             <p>
-                For detailed documentation, backtest audit data, or to discuss ProteanAI's 
-                integration into a portfolio allocation, contact the team directly.
+                For detailed documentation or to discuss ProteanAI's integration 
+                into a portfolio allocation, contact the team directly.
             </p>
-            <p style="margin-top:1.5rem;">
-                <a href="mailto:investors@proteanasset.com" style="color:var(--accent); text-decoration:none; font-family:'JetBrains Mono',monospace; font-size:0.9rem; letter-spacing:0.05em;">
-                    investors@proteanasset.com
-                </a>
-            </p>
+            <a href="mailto:investors@proteanasset.com" class="contact-email" style="margin-top:1.5rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="4" width="20" height="16" rx="2"/>
+                    <path d="M22 4L12 13L2 4"/>
+                </svg>
+                investors@proteanasset.com
+            </a>
         </div>
     </section>
 
