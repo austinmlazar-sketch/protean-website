@@ -2,10 +2,694 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0; url=/">
-    <title>Redirecting...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProteanAI — Protean Asset Management</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap');
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --navy-deep: #080e27;
+            --bg-primary: #060a1a;
+            --bg-secondary: #0a1230;
+            --bg-tertiary: #0e1840;
+            --blue-primary: #0cb5f5;
+            --blue-mid: #2da0e2;
+            --text-primary: #f0f4ff;
+            --text-secondary: #8a9cc7;
+            --text-tertiary: #546190;
+            --accent: var(--blue-primary);
+            --accent-dim: rgba(12, 181, 245, 0.08);
+            --accent-border: rgba(12, 181, 245, 0.18);
+            --border: rgba(140, 170, 255, 0.06);
+            --border-hover: rgba(140, 170, 255, 0.12);
+            --green: #00c896;
+            --red: #ff4d6a;
+            --amber: #f5a623;
+            --gold: #f5c542;
+        }
+
+        html { scroll-behavior: smooth; font-size: 16px; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* ── Nav (matches main site) ── */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            padding: 1.25rem 3rem;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(6, 10, 26, 0.85);
+            backdrop-filter: blur(24px);
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
+        .nav-logo-icon { height: 28px; width: auto; }
+
+        .nav-logo-text {
+            font-size: 0.8rem; font-weight: 500;
+            letter-spacing: 0.2em; text-transform: uppercase;
+            color: var(--text-primary);
+        }
+        .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+        .nav-links a {
+            font-size: 0.75rem; font-weight: 400;
+            letter-spacing: 0.15em; text-transform: uppercase;
+            color: var(--text-tertiary); text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+
+        /* ── Layout ── */
+        section { padding: 6rem 3rem; max-width: 1200px; margin: 0 auto; }
+        .section-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 4rem; align-items: start; }
+        .section-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem; font-weight: 300;
+            letter-spacing: 0.3em; text-transform: uppercase;
+            color: var(--text-tertiary); position: sticky; top: 8rem;
+        }
+        .section-label::before {
+            content: ''; display: inline-block;
+            width: 1.5rem; height: 1px;
+            background: var(--accent); margin-right: 0.75rem;
+            vertical-align: middle;
+        }
+        .section-content h2 {
+            font-size: 1.8rem; font-weight: 400; line-height: 1.4;
+            margin-bottom: 1.5rem; letter-spacing: -0.01em;
+        }
+        .section-content h3 {
+            font-size: 0.95rem; font-weight: 500;
+            margin-top: 2rem; margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        .section-content p {
+            font-size: 0.95rem; font-weight: 300; line-height: 1.9;
+            color: var(--text-secondary); margin-bottom: 1rem;
+        }
+        .highlight { color: var(--accent); font-weight: 400; }
+        .divider {
+            width: 100%; max-width: 1200px; margin: 0 auto; height: 1px;
+            background: linear-gradient(90deg, transparent 0%, var(--accent-border) 50%, transparent 100%);
+        }
+
+        /* ── Hero ── */
+        .hero {
+            min-height: 80vh; display: flex; flex-direction: column;
+            justify-content: center; padding-top: 8rem; max-width: 900px;
+            margin: 0 auto;
+        }
+        .hero-eyebrow {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem; font-weight: 300;
+            letter-spacing: 0.3em; text-transform: uppercase;
+            color: var(--accent); margin-bottom: 2rem;
+            opacity: 0; animation: fadeUp 0.8s ease 0.2s forwards;
+        }
+        .hero h1 {
+            font-size: clamp(2.2rem, 4.5vw, 3.5rem); font-weight: 300;
+            line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 2rem;
+            opacity: 0; animation: fadeUp 0.8s ease 0.4s forwards;
+        }
+        .hero h1 strong {
+            font-weight: 500;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--blue-mid) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-description {
+            font-size: 1.05rem; font-weight: 300; line-height: 1.8;
+            color: var(--text-secondary); max-width: 650px; margin-bottom: 3rem;
+            opacity: 0; animation: fadeUp 0.8s ease 0.6s forwards;
+        }
+        .hero-metrics {
+            display: flex; gap: 3rem; flex-wrap: wrap;
+            opacity: 0; animation: fadeUp 0.8s ease 0.8s forwards;
+        }
+        .hero-metric { display: flex; flex-direction: column; gap: 0.3rem; }
+        .hero-metric-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.3rem; font-weight: 400; color: var(--text-primary);
+        }
+        .hero-metric-label {
+            font-size: 0.65rem; font-weight: 400;
+            letter-spacing: 0.15em; text-transform: uppercase;
+            color: var(--text-tertiary);
+        }
+
+        /* ── Stat Cards ── */
+        .stat-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px; padding: 1.2rem;
+            transition: border-color 0.3s;
+        }
+        .stat-card:hover { border-color: var(--accent-border); }
+        .stat-card-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.4rem; font-weight: 400;
+            color: var(--text-primary); margin-bottom: 0.3rem;
+        }
+        .stat-card-label {
+            font-size: 0.7rem; letter-spacing: 0.1em;
+            text-transform: uppercase; color: var(--text-tertiary);
+        }
+        .stat-card-value.positive { color: var(--green); }
+        .stat-card-value.accent { color: var(--accent); }
+
+        /* ── Pipeline ── */
+        .pipeline { margin: 2rem 0; }
+        .pipeline-phase {
+            margin-bottom: 1.5rem;
+            border-left: 2px solid var(--border);
+            padding-left: 1.5rem;
+            transition: border-color 0.3s;
+        }
+        .pipeline-phase:hover { border-left-color: var(--accent-border); }
+        .pipeline-phase-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem; font-weight: 400;
+            letter-spacing: 0.2em; text-transform: uppercase;
+            color: var(--accent); margin-bottom: 0.4rem;
+        }
+        .pipeline-phase-title {
+            font-size: 1rem; font-weight: 500;
+            color: var(--text-primary); margin-bottom: 0.3rem;
+        }
+        .pipeline-phase-desc {
+            font-size: 0.85rem; font-weight: 300;
+            color: var(--text-secondary); line-height: 1.6;
+        }
+
+        /* ── Comparison Table ── */
+        .comp-table {
+            width: 100%; border-collapse: collapse;
+            margin: 1.5rem 0; font-size: 0.85rem;
+        }
+        .comp-table th {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem; font-weight: 400;
+            letter-spacing: 0.15em; text-transform: uppercase;
+            color: var(--text-tertiary);
+            text-align: left; padding: 0.8rem 1rem;
+            border-bottom: 1px solid var(--accent-border);
+        }
+        .comp-table td {
+            padding: 0.7rem 1rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary); font-weight: 300;
+        }
+        .comp-table td:first-child { color: var(--text-primary); font-weight: 400; }
+        .comp-table .highlight-col { color: var(--accent); font-weight: 500; }
+        .comp-table tr:hover td { background: var(--accent-dim); }
+
+        /* ── Footer ── */
+        footer {
+            padding: 3rem; border-top: 1px solid var(--border);
+            max-width: 1200px; margin: 0 auto;
+        }
+        .footer-content { display: flex; justify-content: space-between; align-items: flex-start; }
+        .footer-legal {
+            font-size: 0.7rem; font-weight: 300;
+            color: var(--text-tertiary); line-height: 1.8; max-width: 700px;
+        }
+        .footer-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; }
+        .footer-text { font-size: 0.7rem; color: var(--text-tertiary); }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in { opacity: 0; transform: translateY(20px); transition: all 0.8s ease; }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 768px) {
+            nav { padding: 1rem 1.5rem; }
+            .nav-links { gap: 1.5rem; }
+            section { padding: 4rem 1.5rem; }
+            .section-grid { grid-template-columns: 1fr; gap: 2rem; }
+            .section-label { position: static; }
+            .terms-row { grid-template-columns: 1fr; }
+            .terms-row-label { border-right: none; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+            .stat-grid { grid-template-columns: repeat(2, 1fr); }
+            .hero-metrics { gap: 2rem; }
+            .hero { padding-top: 6rem; min-height: 70vh; }
+            .footer-content { flex-direction: column; gap: 1.5rem; }
+        }
+
+        /* ═══ TERMS CARD ═══ */
+        .terms-grid {
+            display: flex; flex-direction: column; gap: 1px;
+            background: var(--border); border: 1px solid var(--border);
+            border-radius: 8px; overflow: hidden;
+        }
+        .terms-row {
+            display: grid; grid-template-columns: 1fr 1fr;
+            background: var(--bg-secondary); transition: background 0.2s ease;
+        }
+        .terms-row:hover { background: var(--bg-tertiary); }
+        .terms-row-label {
+            padding: 1.25rem 1.5rem; font-size: 0.8rem; font-weight: 400;
+            color: var(--text-tertiary); letter-spacing: 0.05em;
+            border-right: 1px solid var(--border);
+        }
+        .terms-row-value {
+            padding: 1.25rem 1.5rem; font-size: 0.85rem;
+            font-weight: 400; color: var(--text-primary);
+        }
+        .terms-row-value .sub {
+            display: block; font-size: 0.75rem; font-weight: 300;
+            color: var(--text-tertiary); margin-top: 0.3rem; line-height: 1.5;
+        }
+
+        .contact-email {
+            display: inline-flex; align-items: center; gap: 0.75rem;
+            padding: 0.85rem 1.5rem; border: 1px solid var(--accent-border);
+            border-radius: 6px; background: var(--accent-dim);
+            color: var(--accent); text-decoration: none;
+            font-size: 0.85rem; font-weight: 400; letter-spacing: 0.05em;
+            transition: all 0.3s ease;
+        }
+        .contact-email:hover {
+            background: rgba(12, 181, 245, 0.15);
+            border-color: rgba(12, 181, 245, 0.35);
+            box-shadow: 0 0 30px rgba(12, 181, 245, 0.08);
+        }
+    </style>
 </head>
 <body>
-    <p>Redirecting to <a href="/">Protean Asset Management</a>...</p>
+
+    <nav>
+        <a href="/" class="nav-logo">
+            <!-- P icon mark - inline SVG approximation of the logo -->
+            <svg class="nav-logo-icon" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="5" y="48" width="28" height="28" rx="2" fill="#0cb5f5" opacity="0.55" transform="rotate(-15 19 62)"/>
+                <rect x="20" y="35" width="28" height="28" rx="2" fill="#0cb5f5" opacity="0.8" transform="rotate(-15 34 49)"/>
+                <path d="M42 20 L70 20 Q90 20 90 42 Q90 64 70 64 L58 64 L58 48 L68 48 Q76 48 76 42 Q76 36 68 36 L42 36 Z" fill="#0cb5f5"/>
+            </svg>
+            <span class="nav-logo-text">Protean</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="/#about">About</a></li>
+            <li><a href="/#strategy">Strategy</a></li>
+            <li><a href="/#terms">Terms</a></li>
+            <li><a href="research.html">Research</a></li>
+            <li><a href="proteanai.html" class="active">ProteanAI</a></li>
+            <li><a href="/#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <!-- ═══ HERO ═══ -->
+    <section class="hero" style="padding: 0 3rem;">
+        <div class="hero-eyebrow">Systematic Strategy</div>
+        <h1>
+            <strong>ProteanAI</strong><br>
+            <span style="white-space: nowrap;">Market-Neutral Systematic Engine</span>
+        </h1>
+        <p class="hero-description">
+            A fully autonomous long/short equity strategy with zero human intervention in the 
+            decision loop. From data ingestion to signal generation, conviction scoring, portfolio 
+            construction, and trade execution — every step is machine-driven, every decision 
+            algorithmically derived.
+        </p>
+
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══ OVERVIEW ═══ -->
+    <section id="overview" class="section-grid fade-in">
+        <div class="section-label">Overview</div>
+        <div class="section-content">
+            <h2>End-to-End Machine Intelligence</h2>
+            <p>
+                ProteanAI is not a tool that assists a human trader. It <em>is</em> the trader. 
+                The entire pipeline — from raw market data ingestion through signal generation, 
+                conviction scoring, regime classification, portfolio construction, risk management, 
+                and execution — operates autonomously with no human in the decision loop.
+            </p>
+            <p>
+                The system continuously ingests data from multiple sources, decomposes market 
+                structure across multiple proprietary analytical layers, scores conviction through 
+                an ensemble of proprietary signal layers, and constructs a beta-neutral portfolio 
+                from 31 liquid ETFs spanning equities, fixed income, commodities, and alternatives 
+                at varying concentration levels.
+            </p>
+            <p>
+                A machine-driven beta overlay dynamically manages portfolio-level market exposure, 
+                tilting directionally only when the system's own signals confirm — maintaining 
+                near-zero average beta across full market cycles without human override.
+            </p>
+
+            <h3>Why Fully Autonomous Matters</h3>
+            <p>
+                <span class="highlight">No emotional interference</span> — the system does not 
+                hesitate, second-guess, or capitulate. Conviction is mathematically derived and 
+                positions are sized accordingly, regardless of narrative or fear.
+            </p>
+            <p>
+                <span class="highlight">Deep signal consensus</span> — conviction requires 
+                agreement across independent analytical layers before any position is taken. 
+                The machine sees structure a human analyst cannot.
+            </p>
+            <p>
+                <span class="highlight">Continuous regime adaptation</span> — the system 
+                classifies the prevailing macro environment in real time and adjusts 
+                its behavior algorithmically. No committee meetings, no lag between observation 
+                and action.
+            </p>
+            <p>
+                <span class="highlight">Precision position sizing</span> — no binary in/out 
+                decisions. Capital allocation reflects the machine's confidence in each opportunity, 
+                naturally concentrating exposure where conviction is strongest.
+            </p>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══ PIPELINE ═══ -->
+    <section id="pipeline" class="section-grid fade-in">
+        <div class="section-label">Architecture</div>
+        <div class="section-content">
+            <h2>Signal-to-Execution Pipeline</h2>
+            <p>
+                Six autonomous phases. Zero human decision points. Every layer is algorithmically 
+                defined, mathematically derived, and systematically executed. The human role is 
+                limited to system design and oversight — never trade-level intervention.
+            </p>
+            <div class="pipeline">
+                <div class="pipeline-phase">
+                    <div class="pipeline-phase-label">Phase 01 &mdash; Automated</div>
+                    <div class="pipeline-phase-title">Macro Context Ingestion</div>
+                    <div class="pipeline-phase-desc">
+                        Machine-driven regime classification across five proprietary dimensions. 
+                        Automated geopolitical and policy 
+                        risk assessment. No analyst interpretation required.
+                    </div>
+                </div>
+                <div class="pipeline-phase">
+                    <div class="pipeline-phase-label">Phase 02 &mdash; Automated</div>
+                    <div class="pipeline-phase-title">Adaptive Signal Generation</div>
+                    <div class="pipeline-phase-desc">
+                        Proprietary signal engine scans a curated investable universe continuously, 
+                        generating raw directional signals through a multi-layer evaluation 
+                        process. No human pattern recognition — purely systematic.
+                    </div>
+                </div>
+                <div class="pipeline-phase">
+                    <div class="pipeline-phase-label">Phase 03 &mdash; Automated</div>
+                    <div class="pipeline-phase-title">Conviction Modification</div>
+                    <div class="pipeline-phase-desc">
+                        Raw signals pass through a cross-domain modification layer that integrates 
+                        positioning intelligence, sentiment analytics, and structural market 
+                        data. Every adjustment follows defined quantitative rules — no 
+                        discretionary overlay.
+                    </div>
+                </div>
+                <div class="pipeline-phase">
+                    <div class="pipeline-phase-label">Phase 04 &mdash; Automated</div>
+                    <div class="pipeline-phase-title">Conviction Calibration</div>
+                    <div class="pipeline-phase-desc">
+                        A proprietary calibration framework synthesizes macro momentum conditions 
+                        with derivatives market structure to refine conviction scores and 
+                        position sizing. Options-derived intelligence informs directional 
+                        confidence without being traded directly.
+                    </div>
+                </div>
+                <div class="pipeline-phase">
+                    <div class="pipeline-phase-label">Phase 05 &mdash; Automated</div>
+                    <div class="pipeline-phase-title">Portfolio Construction</div>
+                    <div class="pipeline-phase-desc">
+                        Proprietary scoring-weighted allocation with dynamic risk calibration.
+                        Beta-neutral target with 1x gross leverage. No portfolio 
+                        manager discretion.
+                    </div>
+                </div>
+                <div class="pipeline-phase">
+                    <div class="pipeline-phase-label">Phase 06 &mdash; Automated</div>
+                    <div class="pipeline-phase-title">Execution & Rebalance</div>
+                    <div class="pipeline-phase-desc">
+                        Systematic rebalance cadence with real-time structural monitoring. Full trade audit trail with SHA-256 data 
+                        provenance. Machine-generated, machine-executed, machine-verified.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══ BACKTEST PERFORMANCE ═══ -->
+    <section id="performance" class="section-grid fade-in">
+        <div class="section-label">Performance</div>
+        <div class="section-content">
+            <h2>Backtest Results</h2>
+            <p>
+                February 2022 through April 2026. 1,044 trading days across a bear market, 
+                recovery, rate cycle, and geopolitical shock regime.
+            </p>
+
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="stat-card-value positive">59.2%</div>
+                    <div class="stat-card-label">Total Return</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-value accent">0.87</div>
+                    <div class="stat-card-label">Sharpe Ratio</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-value accent">1.31</div>
+                    <div class="stat-card-label">Sortino Ratio</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-value positive">-7.9%</div>
+                    <div class="stat-card-label">Max Drawdown</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-value">11.9%</div>
+                    <div class="stat-card-label">CAGR</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-value">-0.029</div>
+                    <div class="stat-card-label">Beta to SPY</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-value">53.6%</div>
+                    <div class="stat-card-label">Win Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-value">1.27</div>
+                    <div class="stat-card-label">Profit Factor</div>
+                </div>
+            </div>
+
+            <h3>Comparative Performance</h3>
+            <table class="comp-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th class="highlight-col">ProteanAI</th>
+                        <th>SPY Buy & Hold</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Total Return</td>
+                        <td class="highlight-col">59.2%</td>
+                        <td>56.4%</td>
+                    </tr>
+                    <tr>
+                        <td>Sharpe Ratio</td>
+                        <td class="highlight-col">0.87</td>
+                        <td>0.44</td>
+                    </tr>
+                    <tr>
+                        <td>Max Drawdown</td>
+                        <td class="highlight-col">-7.9%</td>
+                        <td>-22.1%</td>
+                    </tr>
+                    <tr>
+                        <td>Sortino Ratio</td>
+                        <td class="highlight-col">1.31</td>
+                        <td>0.63</td>
+                    </tr>
+                    <tr>
+                        <td>Beta</td>
+                        <td class="highlight-col">-0.029</td>
+                        <td>1.00</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="font-size:0.75rem; color:var(--text-tertiary); font-style:italic; margin-top:0.5rem;">
+                As of April 4, 2026. 31-ETF universe. 5bps round-trip transaction costs, 5.3% annual financing, 
+                1x gross leverage, weekly rebalance. Lead variant shown.
+            </p>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══ RISK MANAGEMENT ═══ -->
+    <section id="risk" class="section-grid fade-in">
+        <div class="section-label">Risk</div>
+        <div class="section-content">
+            <h2>Risk Management</h2>
+            <p>
+                Risk control is embedded at every layer of the pipeline, not bolted on as 
+                a post-trade check.
+            </p>
+            <h3>Structural Controls</h3>
+            <p>
+                <span class="highlight">Beta neutrality</span> — dynamic long/short allocation 
+                targets near-zero portfolio beta regardless of individual position performance.
+            </p>
+            <p>
+                <span class="highlight">Conviction gating</span> — algorithmic entry and exit 
+                criteria govern all position changes. No discretionary override.
+            </p>
+            <p>
+                <span class="highlight">Complexity filtering</span> — a specialized market 
+                microstructure measure that dynamically attenuates signal strength during periods of extreme trend exhaustion, 
+                when reversal probability is elevated.
+            </p>
+            <p>
+                <span class="highlight">Leverage discipline</span> — 1x gross maximum. No 
+                derivatives leverage or synthetic exposure.
+            </p>
+
+            <h3>Audit & Provenance</h3>
+            <p>
+                Every signal, trade, and rebalance is recorded with full attribution. Input data 
+                is SHA-256 checksummed for provenance verification. The backtest is independently 
+                verifiable through thousands of trade records with no-lookahead confirmation.
+            </p>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+
+    <!-- ═══ STRATEGY TERMS ═══ -->
+    <section id="terms" class="section-grid fade-in">
+        <div class="section-label">Terms</div>
+        <div class="section-content">
+            <h2>Strategy Terms</h2>
+            <div class="terms-grid">
+                <div class="terms-row">
+                    <div class="terms-row-label">Strategy</div>
+                    <div class="terms-row-value">ProteanAI</div>
+                </div>
+                <div class="terms-row">
+                    <div class="terms-row-label">Benchmark</div>
+                    <div class="terms-row-value">S&amp;P 500 (SPX)</div>
+                </div>
+                <div class="terms-row">
+                    <div class="terms-row-label">Manager</div>
+                    <div class="terms-row-value">
+                        Autonomous Systematic Engine
+                        <span class="sub">~16,000 lines of proprietary Python across signal generation, conviction scoring, portfolio construction, and execution infrastructure. Zero human decision points.</span>
+                    </div>
+                </div>
+                <div class="terms-row">
+                    <div class="terms-row-label">Management Fee</div>
+                    <div class="terms-row-value">2% of AUM</div>
+                </div>
+                <div class="terms-row">
+                    <div class="terms-row-label">Performance Fee</div>
+                    <div class="terms-row-value">
+                        20% of profits
+                        <span class="sub">Subject to high watermark. Performance fees are only charged on new profits &mdash; if the fund declines, prior losses must be fully recovered before performance fees resume.</span>
+                    </div>
+                </div>
+                <div class="terms-row">
+                    <div class="terms-row-label">Target Sharpe</div>
+                    <div class="terms-row-value">&gt; 1.0</div>
+                </div>
+                <div class="terms-row">
+                    <div class="terms-row-label">Target Sortino</div>
+                    <div class="terms-row-value">&gt; 1.5</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ═══ CONTACT ═══ -->
+    <section id="contact" class="section-grid fade-in">
+        <div class="section-label">Contact</div>
+        <div class="section-content">
+            <h2>Learn More</h2>
+            <p>
+                For detailed documentation or to discuss ProteanAI's integration 
+                into a portfolio allocation, contact the team directly.
+            </p>
+            <a href="mailto:investors@proteanasset.com" class="contact-email" style="margin-top:1.5rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="4" width="20" height="16" rx="2"/>
+                    <path d="M22 4L12 13L2 4"/>
+                </svg>
+                investors@proteanasset.com
+            </a>
+        </div>
+    </section>
+
+    <!-- ═══ FOOTER ═══ -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-legal">
+                <strong>HYPOTHETICAL BACKTEST RESULTS</strong> &mdash; All performance data on this page 
+                is derived from hypothetical backtesting of a systematic trading model applied to historical 
+                market data. Hypothetical results have inherent limitations: (i) they are designed with the 
+                benefit of hindsight, (ii) they do not reflect actual trading, (iii) they do not account for 
+                all market conditions including liquidity constraints at scale, and (iv) no representation is 
+                made that any account will or is likely to achieve profits or losses similar to those shown. 
+                Actual trading results may differ materially.
+                <br><br>
+                <strong>NOT A REGISTERED INVESTMENT ADVISER</strong> &mdash; Protean Asset Management LLC 
+                is not currently registered as an investment adviser with the SEC or any state securities 
+                authority.
+                <br><br>
+                <strong>PAST PERFORMANCE IS NOT INDICATIVE OF FUTURE RESULTS.</strong> Nothing on this page 
+                constitutes an offer to sell or a solicitation of an offer to buy any securities.
+                <br><br>
+                &copy; 2026 Protean Asset Management LLC. All rights reserved.
+            </div>
+            <div class="footer-right">
+                <div class="footer-text">Protean Asset Management</div>
+                <a href="/" style="color:var(--accent); text-decoration:none; font-size:0.7rem;">&larr; Main Site</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    </script>
+
 </body>
 </html>
+<!-- deploy 1775702871 -->
